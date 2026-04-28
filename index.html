@@ -1,6 +1,1357 @@
-<doctype html>
-  <html>
-    <body>
-      <a href="veklam_website.html">click</a>
-    </body>
-  </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veklam{ — Fashion Platform</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --cream: #F7F4EF;
+  --warm-white: #EDEAD3;
+  --caramel: #C8956C;
+  --dark-brown: #8B5E3C;
+  --charcoal: #1A1A1A;
+  --soft-gray: #9A8F82;
+  --light-border: #DDD8D0;
+  --error-red: #E05252;
+  --success-green: #52A869;
+  --customer-color: #7B9DC5;
+  --designer-color: #9B7BC5;
+  --printing-color: #7BC58B;
+  --super-color: #C8956C;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; }
+.playfair { font-family: 'Playfair Display', serif; }
+.text-soft { color: var(--soft-gray); }
+.text-caramel { color: var(--caramel); }
+.bg-cream { background: var(--cream); }
+.bg-warm { background: #EDEAD3; }
+.border-light-custom { border-color: var(--light-border) !important; }
+
+/* ── Pages ── */
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ── Login ── */
+#page-login { background: var(--cream); }
+.login-wrap { max-width: 440px; margin: 0 auto; padding: 60px 28px 40px; }
+.logo-text { font-size: 52px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+.logo-brace { color: var(--caramel); }
+.login-subtitle { font-size: 14px; color: var(--soft-gray); margin-top: 8px; }
+.form-control-veklam {
+  background: #EDEAD3; border: 1.5px solid var(--light-border); border-radius: 14px;
+  padding: 12px 16px 12px 44px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+  color: var(--charcoal); width: 100%; transition: border-color .2s;
+}
+.form-control-veklam:focus { outline: none; border-color: var(--caramel); box-shadow: 0 0 0 3px rgba(200,149,108,.12); }
+.input-wrap { position: relative; }
+.input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--soft-gray); font-size: 16px; }
+.input-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--soft-gray); cursor: pointer; font-size: 16px; border: none; background: none; }
+.btn-veklam-dark {
+  background: var(--charcoal); color: #fff; border: none; border-radius: 14px;
+  padding: 14px 24px; font-size: 14px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  width: 100%; cursor: pointer; transition: opacity .2s;
+}
+.btn-veklam-dark:hover { opacity: .85; }
+.btn-veklam-caramel {
+  background: var(--caramel); color: #fff; border: none; border-radius: 14px;
+  padding: 14px 24px; font-size: 14px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: opacity .2s;
+}
+.btn-veklam-caramel:hover { opacity: .85; }
+.btn-outline-veklam {
+  background: #fff; border: 1.5px solid var(--light-border); border-radius: 14px;
+  padding: 12px 18px; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: all .2s; color: var(--charcoal); display: flex; align-items: center; gap: 8px; justify-content: center;
+}
+.btn-outline-veklam:hover { border-color: var(--charcoal); }
+.divider-or { display: flex; align-items: center; gap: 16px; color: var(--soft-gray); font-size: 13px; }
+.divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1.5px; background: var(--light-border); }
+.role-card {
+  background: #fff; border: 1.5px solid var(--light-border); border-radius: 20px;
+  padding: 18px; cursor: pointer; transition: all .25s; display: flex; align-items: center; gap: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.04);
+}
+.role-card:hover { border-color: var(--caramel); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.08); }
+.role-icon-wrap { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.role-arrow { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; }
+.fade-in { animation: fadeIn .5s ease forwards; }
+.slide-up { animation: slideUp .5s ease forwards; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+.role-card:nth-child(1) { animation: slideUp .4s .05s both; }
+.role-card:nth-child(2) { animation: slideUp .4s .13s both; }
+.role-card:nth-child(3) { animation: slideUp .4s .21s both; }
+.role-card:nth-child(4) { animation: slideUp .4s .29s both; }
+
+/* ── App Layout ── */
+.app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+.app-navbar {
+  background: #fff; border-bottom: 1px solid var(--light-border);
+  padding: 0 24px; height: 64px; display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 16px rgba(0,0,0,.05);
+}
+.nav-logo { font-size: 26px; font-weight: 900; font-family: 'Playfair Display', serif; letter-spacing: -1px; }
+.nav-tabs-custom { display: flex; gap: 4px; margin-left: auto; }
+.nav-tab-btn {
+  padding: 7px 18px; border-radius: 12px; border: none; background: transparent;
+  font-size: 13px; font-weight: 600; color: var(--soft-gray); cursor: pointer; transition: all .2s;
+  font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px;
+}
+.nav-tab-btn:hover { background: var(--cream); color: var(--charcoal); }
+.nav-tab-btn.active { background: var(--charcoal); color: #fff; }
+.nav-tab-btn.active-customer { background: var(--customer-color); color: #fff; }
+.nav-tab-btn.active-designer { background: var(--designer-color); color: #fff; }
+.nav-tab-btn.active-printing { background: var(--printing-color); color: #fff; }
+.nav-tab-btn.active-super { background: var(--super-color); color: #fff; }
+.app-content { flex: 1; padding: 28px 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
+.nav-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--caramel); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; cursor: pointer; flex-shrink: 0; }
+
+/* ── Stat Cards ── */
+.stat-card {
+  background: #fff; border-radius: 20px; padding: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.05); transition: transform .2s;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-icon-wrap { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 18px; }
+.stat-value { font-size: 28px; font-weight: 900; font-family: 'Playfair Display', serif; line-height: 1; }
+.stat-label { font-size: 12px; color: var(--soft-gray); font-weight: 500; margin-top: 4px; }
+.stat-sub { font-size: 10px; color: var(--soft-gray); margin-top: 2px; }
+
+/* ── Product Cards ── */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.product-card {
+  background: #fff; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.06); cursor: pointer; transition: all .25s;
+}
+.product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.1); }
+.product-img { position: relative; aspect-ratio: 3/3.5; overflow: hidden; }
+.product-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.product-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+.wishlist-btn {
+  position: absolute; top: 10px; right: 10px; width: 32px; height: 32px;
+  background: rgba(255,255,255,.92); border-radius: 50%; border: none;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  font-size: 15px; transition: transform .2s;
+}
+.wishlist-btn:hover { transform: scale(1.15); }
+.product-badges { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 4px; }
+.badge-new { background: var(--caramel); color: #fff; font-size: 8px; font-weight: 800; padding: 3px 8px; border-radius: 20px; letter-spacing: .5px; }
+.badge-trend { background: #E05252; color: #fff; font-size: 8px; font-weight: 800; padding: 3px 8px; border-radius: 20px; }
+.badge-3d { position: absolute; bottom: 10px; left: 10px; background: rgba(26,26,26,.8); color: #fff; font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px; }
+.product-img-grad { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(0,0,0,.15), transparent); pointer-events: none; }
+.product-info { padding: 12px; }
+.product-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.product-brand { font-size: 10px; color: var(--soft-gray); }
+.product-price { font-size: 15px; font-weight: 800; font-family: 'Playfair Display', serif; }
+.add-btn { width: 28px; height: 28px; background: var(--charcoal); border: none; border-radius: 8px; color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity .2s; }
+.add-btn:hover { opacity: .8; }
+
+/* ── Category Chips ── */
+.chip-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chip-bar::-webkit-scrollbar { display: none; }
+.chip {
+  padding: 7px 16px; border-radius: 30px; border: 1.5px solid var(--light-border);
+  background: #EDEAD3; font-size: 12px; font-weight: 600; color: var(--soft-gray);
+  cursor: pointer; white-space: nowrap; transition: all .2s;
+}
+.chip.active { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+.chip:hover:not(.active) { border-color: var(--charcoal); color: var(--charcoal); }
+
+/* ── Ad Banners ── */
+.ad-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; }
+.ad-scroll::-webkit-scrollbar { display: none; }
+.ad-card { width: 200px; min-width: 200px; height: 105px; border-radius: 18px; position: relative; overflow: hidden; cursor: pointer; flex-shrink: 0; }
+.ad-card-inner { position: absolute; inset: 0; padding: 14px; }
+.ad-bubble { position: absolute; top: -20px; right: -20px; width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,.07); }
+.ad-tag { font-size: 8px; color: rgba(255,255,255,.6); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.ad-title { font-size: 14px; color: #fff; font-weight: 800; font-family: 'Playfair Display', serif; line-height: 1.3; margin-top: 2px; }
+.ad-cta { position: absolute; bottom: 12px; right: 12px; background: rgba(255,255,255,.2); color: #fff; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+.ad-emoji { position: absolute; top: 14px; right: 14px; font-size: 28px; }
+.sponsored-label { font-size: 10px; color: var(--soft-gray); font-weight: 700; letter-spacing: 1.2px; }
+
+/* ── Product Modal ── */
+.modal-backdrop-custom { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 999; display: none; align-items: flex-end; justify-content: center; }
+.modal-backdrop-custom.open { display: flex; }
+.modal-sheet { background: var(--cream); border-radius: 24px 24px 0 0; max-height: 92vh; overflow-y: auto; width: 100%; max-width: 640px; padding: 0 0 32px; animation: sheetUp .3s ease; }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-img-wrap { position: relative; height: 360px; overflow: hidden; background: #EDEAD3; }
+.modal-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.modal-top-btns { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; gap: 8px; }
+.modal-top-btn { width: 40px; height: 40px; background: rgba(255,255,255,.9); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.view-toggle { display: flex; background: #fff; border-radius: 14px; border: 1.5px solid var(--light-border); overflow: hidden; margin: 0 16px 16px; }
+.view-toggle-btn { flex: 1; padding: 8px; font-size: 12px; font-weight: 600; border: none; background: transparent; cursor: pointer; color: var(--soft-gray); transition: all .2s; }
+.view-toggle-btn.active { background: var(--charcoal); color: #fff; border-radius: 12px; margin: 3px; }
+.size-btn { width: 52px; height: 44px; border-radius: 12px; border: 1.5px solid var(--light-border); background: #EDEAD3; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; }
+.size-btn.active { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+.color-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+.color-dot.active { border-color: var(--charcoal); }
+.qty-btn { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--light-border); background: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+.modal-footer { background: #fff; border-top: 1px solid var(--light-border); padding: 16px; display: flex; gap: 12px; position: sticky; bottom: 0; }
+
+/* ── Cart Sidebar ── */
+.cart-sidebar { position: fixed; right: 0; top: 0; bottom: 0; width: 400px; max-width: 100vw; background: #fff; z-index: 200; transform: translateX(110%); transition: transform .3s ease; box-shadow: -8px 0 32px rgba(0,0,0,.1); display: flex; flex-direction: column; }
+.cart-sidebar.open { transform: translateX(0); }
+.cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 199; display: none; }
+.cart-overlay.open { display: block; }
+.cart-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--light-border); display: flex; align-items: center; gap: 12px; }
+.cart-body { flex: 1; overflow-y: auto; padding: 16px; }
+.cart-footer { padding: 16px; border-top: 1px solid var(--light-border); background: #fff; }
+.cart-item { display: flex; gap: 12px; background: var(--cream); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
+.cart-item-img { width: 68px; height: 68px; border-radius: 10px; object-fit: cover; background: #EDEAD3; flex-shrink: 0; overflow: hidden; }
+.cart-empty { text-align: center; padding: 60px 20px; }
+
+/* ── Wishlist / Profile ── */
+.section-title { font-size: 24px; font-weight: 800; font-family: 'Playfair Display', serif; }
+.card-veklam { background: #fff; border-radius: 18px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+.list-item-veklam { background: #fff; border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all .2s; }
+.list-item-veklam:hover { background: var(--cream); }
+.profile-avatar { width: 88px; height: 88px; border-radius: 50%; background: var(--caramel); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; margin: 0 auto 12px; }
+
+/* ── Role Badge ── */
+.role-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+.order-chip { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+
+/* ── Designer / Upload ── */
+.upload-zone { border: 2px dashed var(--light-border); border-radius: 20px; padding: 48px 24px; text-align: center; background: #EDEAD3; cursor: pointer; transition: all .2s; }
+.upload-zone:hover { border-color: var(--caramel); background: #EDE6DC; }
+.tag-chip { padding: 7px 14px; border-radius: 30px; border: 1.5px solid var(--light-border); background: #EDEAD3; font-size: 12px; font-weight: 600; color: var(--soft-gray); cursor: pointer; transition: all .2s; display: inline-block; margin: 4px; }
+.tag-chip.active { background: var(--designer-color); border-color: var(--designer-color); color: #fff; }
+.design-tile { background: #fff; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.04); margin-bottom: 10px; }
+.design-icon { width: 52px; height: 52px; border-radius: 12px; background: rgba(155,123,197,.1); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+
+/* ── Order Tiles ── */
+.order-tile { background: #fff; border-radius: 18px; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,.04); margin-bottom: 10px; }
+.order-row { display: flex; align-items: center; gap: 12px; }
+
+/* ── Charts ── */
+.chart-card { background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,.05); }
+
+/* ── Search bar ── */
+.search-bar { display: flex; align-items: center; gap: 12px; background: #EDEAD3; border: 1.5px solid var(--light-border); border-radius: 16px; padding: 10px 14px; }
+.search-bar input { border: none; background: transparent; flex: 1; font-size: 14px; color: var(--charcoal); font-family: 'DM Sans', sans-serif; outline: none; }
+.search-bar input::placeholder { color: var(--soft-gray); }
+.filter-btn { width: 34px; height: 34px; background: var(--charcoal); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; flex-shrink: 0; }
+
+/* ── Toasts ── */
+.toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+.toast-veklam { background: var(--charcoal); color: #fff; padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.2); animation: toastIn .3s ease; min-width: 200px; text-align: center; }
+.toast-veklam.success { background: var(--success-green); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── User Table ── */
+.user-tile { background: #fff; border-radius: 18px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.04); margin-bottom: 10px; }
+.user-avatar-sm { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+
+/* ── Product Mgmt ── */
+.product-row { background: #fff; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.04); margin-bottom: 10px; }
+.product-thumb { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: #EDEAD3; overflow: hidden; flex-shrink: 0; }
+
+/* ── Dots ── */
+.img-dots { display: flex; gap: 6px; justify-content: center; padding: 12px 0; }
+.img-dot { width: 6px; height: 6px; border-radius: 3px; background: var(--light-border); cursor: pointer; transition: all .2s; }
+.img-dot.active { width: 20px; background: var(--charcoal); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .app-navbar { padding: 0 16px; height: 56px; }
+  .nav-tabs-custom { gap: 2px; }
+  .nav-tab-btn { padding: 6px 12px; font-size: 12px; }
+  .app-content { padding: 20px 16px; }
+  .cart-sidebar { width: 100vw; }
+  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .login-wrap { padding: 40px 20px; }
+  .logo-text { font-size: 40px; }
+}
+@media (max-width: 480px) {
+  .nav-tab-btn span { display: none; }
+  .nav-tab-btn { padding: 8px 10px; }
+}
+
+/* ── Misc ── */
+.section-gap { height: 24px; }
+.fw-800 { font-weight: 800; }
+.fw-900 { font-weight: 900; }
+.bg-success-soft { background: rgba(82,168,105,.12); color: var(--success-green); }
+.bg-caramel-soft { background: rgba(200,149,108,.12); color: var(--caramel); }
+.bg-error-soft { background: rgba(224,82,82,.12); color: var(--error-red); }
+.bg-warn-soft { background: rgba(224,160,48,.12); color: #E0A030; }
+.logout-btn { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #fff; border-radius: 14px; border: none; cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--soft-gray); transition: all .2s; width: 100%; }
+.logout-btn:hover { background: var(--cream); color: var(--charcoal); }
+.badge-cart { position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; background: var(--caramel); border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.nav-cart-wrap { position: relative; }
+.back-btn { background: none; border: none; cursor: pointer; color: var(--charcoal); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; padding: 0; font-family: 'DM Sans', sans-serif; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     PAGE: LOGIN
+════════════════════════════════════════════ -->
+<div id="page-login" class="page active">
+  <div class="login-wrap fade-in">
+    <!-- Logo -->
+    <div id="login-header">
+      <div class="logo-text playfair">Veklam<span class="logo-brace">{</span></div>
+      <div class="login-subtitle" id="login-sub-text">Welcome back. Sign in to your account.</div>
+    </div>
+    <div style="height:40px"></div>
+
+    <!-- Login Form -->
+    <div id="login-form">
+      <div class="input-wrap mb-3">
+        <i class="bi bi-envelope input-icon"></i>
+        <input type="email" id="email-input" class="form-control-veklam" placeholder="Email address" value="demo@veklam.com">
+      </div>
+      <div class="input-wrap mb-2">
+        <i class="bi bi-lock input-icon"></i>
+        <input type="password" id="pass-input" class="form-control-veklam" placeholder="Password" value="••••••••">
+        <button class="input-toggle" onclick="togglePass()"><i class="bi bi-eye-slash" id="pass-icon"></i></button>
+      </div>
+      <div class="text-end mb-4">
+        <a href="#" class="text-caramel" style="font-size:13px;font-weight:600;text-decoration:none">Forgot password?</a>
+      </div>
+      <button class="btn-veklam-dark mb-4" onclick="showRoles()">Continue</button>
+      <div class="divider-or mb-4">or</div>
+      <div class="row g-3 mb-4">
+        <div class="col-6"><button class="btn-outline-veklam w-100" onclick="showRoles()"><i class="bi bi-google" style="color:#4285F4"></i> Google</button></div>
+        <div class="col-6"><button class="btn-outline-veklam w-100" onclick="showRoles()"><i class="bi bi-apple"></i> Apple</button></div>
+      </div>
+      <p class="text-center" style="font-size:13px;color:var(--soft-gray)">Don't have an account? <a href="#" class="text-caramel fw-bold" style="text-decoration:none">Sign up</a></p>
+    </div>
+
+    <!-- Role Selection -->
+    <div id="role-selection" style="display:none">
+      <div class="role-card mb-3" onclick="selectRole('customer')">
+        <div class="role-icon-wrap" style="background:rgba(123,157,197,.12)">🛍️</div>
+        <div class="flex-grow-1">
+          <div style="font-size:15px;font-weight:700">Customer</div>
+          <div style="font-size:12px;color:var(--soft-gray)">Browse, customize & order fashion items</div>
+        </div>
+        <div class="role-arrow" style="background:rgba(123,157,197,.12);color:var(--customer-color)"><i class="bi bi-chevron-right"></i></div>
+      </div>
+      <div class="role-card mb-3" onclick="selectRole('designer')">
+        <div class="role-icon-wrap" style="background:rgba(155,123,197,.12)">🎨</div>
+        <div class="flex-grow-1">
+          <div style="font-size:15px;font-weight:700">Designer Admin</div>
+          <div style="font-size:12px;color:var(--soft-gray)">Create & manage product designs</div>
+        </div>
+        <div class="role-arrow" style="background:rgba(155,123,197,.12);color:var(--designer-color)"><i class="bi bi-chevron-right"></i></div>
+      </div>
+      <div class="role-card mb-3" onclick="selectRole('printing')">
+        <div class="role-icon-wrap" style="background:rgba(123,197,139,.12)">🖨️</div>
+        <div class="flex-grow-1">
+          <div style="font-size:15px;font-weight:700">Printing Admin</div>
+          <div style="font-size:12px;color:var(--soft-gray)">Manage & fulfill print orders</div>
+        </div>
+        <div class="role-arrow" style="background:rgba(123,197,139,.12);color:var(--printing-color)"><i class="bi bi-chevron-right"></i></div>
+      </div>
+      <div class="role-card" onclick="selectRole('superadmin')">
+        <div class="role-icon-wrap" style="background:rgba(200,149,108,.12)">👑</div>
+        <div class="flex-grow-1">
+          <div style="font-size:15px;font-weight:700">Super Admin</div>
+          <div style="font-size:12px;color:var(--soft-gray)">Full platform control & analytics</div>
+        </div>
+        <div class="role-arrow" style="background:rgba(200,149,108,.12);color:var(--super-color)"><i class="bi bi-chevron-right"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: CUSTOMER
+════════════════════════════════════════════ -->
+<div id="page-customer" class="page">
+  <div class="app-layout">
+    <!-- Navbar -->
+    <nav class="app-navbar">
+      <div class="nav-logo playfair">Veklam<span style="color:var(--caramel)">{</span></div>
+      <div class="nav-tabs-custom">
+        <button class="nav-tab-btn active-customer active" id="ctab-shop" onclick="customerTab('shop')"><i class="bi bi-bag"></i> <span>Shop</span></button>
+        <button class="nav-tab-btn" id="ctab-wishlist" onclick="customerTab('wishlist')"><i class="bi bi-heart"></i> <span>Saved</span></button>
+        <button class="nav-tab-btn nav-cart-wrap" id="ctab-cart" onclick="openCart()">
+          <i class="bi bi-cart"></i> <span>Cart</span>
+          <span class="badge-cart" id="cart-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-tab-btn" id="ctab-profile" onclick="customerTab('profile')"><i class="bi bi-person"></i> <span>Profile</span></button>
+      </div>
+      <div class="nav-avatar" id="customer-avatar">A</div>
+    </nav>
+
+    <div class="app-content">
+      <!-- SHOP TAB -->
+      <div id="ctab-shop-content">
+        <!-- Search -->
+        <div class="search-bar mb-4">
+          <i class="bi bi-search" style="color:var(--soft-gray)"></i>
+          <input type="text" placeholder="Search for styles, brands…" id="shop-search" oninput="filterProducts()">
+          <button class="filter-btn"><i class="bi bi-sliders" style="color:#fff;font-size:14px"></i></button>
+        </div>
+
+        <!-- Sponsored Ads -->
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="sponsored-label">✦ SPONSORED</span>
+        </div>
+        <div class="ad-scroll mb-4" id="ad-scroll"></div>
+
+        <!-- Categories -->
+        <div class="chip-bar mb-4" id="category-bar"></div>
+
+        <!-- Section Header -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h2 class="playfair fw-800" style="font-size:20px">New Arrivals</h2>
+          <span style="font-size:13px;color:var(--caramel);font-weight:600;cursor:pointer">See all →</span>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="product-grid" id="product-grid"></div>
+      </div>
+
+      <!-- WISHLIST TAB -->
+      <div id="ctab-wishlist-content" style="display:none">
+        <h2 class="section-title mb-4">Saved</h2>
+        <div id="wishlist-content"></div>
+      </div>
+
+      <!-- PROFILE TAB -->
+      <div id="ctab-profile-content" style="display:none">
+        <h2 class="section-title mb-4">Profile</h2>
+        <div id="profile-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: DESIGNER
+════════════════════════════════════════════ -->
+<div id="page-designer" class="page">
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <div class="nav-logo playfair">Veklam<span style="color:var(--designer-color)">{</span></div>
+      <div class="nav-tabs-custom">
+        <button class="nav-tab-btn active-designer active" id="dtab-dashboard" onclick="designerTab('dashboard')"><i class="bi bi-grid"></i> <span>Dashboard</span></button>
+        <button class="nav-tab-btn" id="dtab-designs" onclick="designerTab('designs')"><i class="bi bi-palette"></i> <span>Designs</span></button>
+        <button class="nav-tab-btn" id="dtab-upload" onclick="designerTab('upload')"><i class="bi bi-plus-circle"></i> <span>Upload</span></button>
+        <button class="nav-tab-btn" id="dtab-dprofile" onclick="designerTab('dprofile')"><i class="bi bi-person"></i> <span>Profile</span></button>
+      </div>
+      <div class="nav-avatar" style="background:var(--designer-color)" id="designer-avatar">Y</div>
+    </nav>
+    <div class="app-content">
+      <div id="dtab-dashboard-content"></div>
+      <div id="dtab-designs-content" style="display:none"></div>
+      <div id="dtab-upload-content" style="display:none"></div>
+      <div id="dtab-dprofile-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: PRINTING
+════════════════════════════════════════════ -->
+<div id="page-printing" class="page">
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <div class="nav-logo playfair">Veklam<span style="color:var(--printing-color)">{</span></div>
+      <div class="nav-tabs-custom">
+        <button class="nav-tab-btn active-printing active" id="ptab-dashboard" onclick="printingTab('dashboard')"><i class="bi bi-grid"></i> <span>Dashboard</span></button>
+        <button class="nav-tab-btn" id="ptab-orders" onclick="printingTab('orders')"><i class="bi bi-list-ul"></i> <span>Orders</span></button>
+        <button class="nav-tab-btn" id="ptab-queue" onclick="printingTab('queue')"><i class="bi bi-printer"></i> <span>Queue</span></button>
+        <button class="nav-tab-btn" id="ptab-pprofile" onclick="printingTab('pprofile')"><i class="bi bi-person"></i> <span>Profile</span></button>
+      </div>
+      <div class="nav-avatar" style="background:var(--printing-color)" id="printing-avatar">K</div>
+    </nav>
+    <div class="app-content">
+      <div id="ptab-dashboard-content"></div>
+      <div id="ptab-orders-content" style="display:none"></div>
+      <div id="ptab-queue-content" style="display:none"></div>
+      <div id="ptab-pprofile-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE: SUPER ADMIN
+════════════════════════════════════════════ -->
+<div id="page-superadmin" class="page">
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <div class="nav-logo playfair">Veklam<span style="color:var(--super-color)">{</span></div>
+      <div class="nav-tabs-custom">
+        <button class="nav-tab-btn active-super active" id="stab-overview" onclick="superTab('overview')"><i class="bi bi-bar-chart"></i> <span>Overview</span></button>
+        <button class="nav-tab-btn" id="stab-users" onclick="superTab('users')"><i class="bi bi-people"></i> <span>Users</span></button>
+        <button class="nav-tab-btn" id="stab-products" onclick="superTab('products')"><i class="bi bi-box"></i> <span>Products</span></button>
+        <button class="nav-tab-btn" id="stab-analytics" onclick="superTab('analytics')"><i class="bi bi-graph-up"></i> <span>Analytics</span></button>
+      </div>
+      <div class="nav-avatar" style="background:var(--super-color)" id="super-avatar">N</div>
+    </nav>
+    <div class="app-content">
+      <div id="stab-overview-content"></div>
+      <div id="stab-users-content" style="display:none"></div>
+      <div id="stab-products-content" style="display:none"></div>
+      <div id="stab-analytics-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ Cart Sidebar ════ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="cart-header">
+    <h3 class="playfair fw-800" style="font-size:20px">Cart</h3>
+    <span class="ms-2 text-soft" id="cart-count-label">(0)</span>
+    <button class="ms-auto btn-outline-veklam" style="padding:6px 14px;font-size:12px" onclick="clearCart()">Clear</button>
+    <button class="modal-top-btn ms-2" onclick="closeCart()"><i class="bi bi-x-lg" style="font-size:14px"></i></button>
+  </div>
+  <div class="cart-body" id="cart-body"></div>
+  <div class="cart-footer" id="cart-footer"></div>
+</div>
+
+<!-- ════ Product Modal ════ -->
+<div class="modal-backdrop-custom" id="product-modal">
+  <div class="modal-sheet" id="modal-sheet">
+    <!-- filled dynamically -->
+  </div>
+</div>
+
+<!-- ════ Toast ════ -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const COLORS = [
+  {name:'Charcoal', hex:'#2D2D2D'},
+  {name:'Caramel',  hex:'#C8956C'},
+  {name:'Ivory',    hex:'#F5F0E8'},
+  {name:'Navy',     hex:'#1E3A5F'},
+  {name:'Sage',     hex:'#8FAF8F'},
+  {name:'Rose',     hex:'#D4829A'},
+];
+const PRODUCTS = [
+  {id:'p1',name:'Linen Drop Tee',brand:'VEKLAM BASICS',desc:'Ultra-soft linen blend tee with a relaxed drop shoulder. Breathable, lightweight and timeless.',price:42,cat:'T-Shirt',images:['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800','https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=800'],colors:[0,1,2],sizes:['XS','S','M','L','XL','XXL'],has3d:true,isNew:true,isTrending:false,rating:4.8,reviews:124,gradient:['#E8D5C4','#C8956C'],icon:'👕'},
+  {id:'p2',name:'Cloud Hoodie',brand:'VEKLAM COZY',desc:'Impossibly soft fleece hoodie with kangaroo pocket. Perfect layering piece for any season.',price:89,cat:'Hoodie',images:['https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800','https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=800'],colors:[3,0,4],sizes:['S','M','L','XL','XXL'],has3d:true,isNew:false,isTrending:true,rating:4.9,reviews:287,gradient:['#C5D4E8','#7B9DC5'],icon:'🧥'},
+  {id:'p3',name:'Wide Leg Trousers',brand:'VEKLAM FIT',desc:'Relaxed wide-leg silhouette in wrinkle-resistant crepe. Elevated comfort from office to evening.',price:67,cat:'Pants',images:['https://images.unsplash.com/photo-1594938298603-c8148c4b4fec?w=800'],colors:[1,5,2],sizes:['XS','S','M','L','XL'],has3d:true,isNew:false,isTrending:false,rating:4.6,reviews:89,gradient:['#D4E8D0','#7BC58B'],icon:'👖'},
+  {id:'p4',name:'Oversized Coat',brand:'VEKLAM LUXE',desc:'Statement oversized coat in premium wool blend. Structured shoulders, clean minimalist lines.',price:145,cat:'Coat',images:['https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=800'],colors:[0,2,3],sizes:['XS','S','M','L','XL'],has3d:true,isNew:false,isTrending:true,rating:4.7,reviews:156,gradient:['#E8C5D0','#C57B8B'],icon:'🧣'},
+  {id:'p5',name:'Slip Midi Dress',brand:'VEKLAM LUXE',desc:'Elegant satin-finish midi dress with adjustable straps. Effortlessly transitions from day to night.',price:98,cat:'Dress',images:['https://images.unsplash.com/photo-1572804013427-4d7ca7268217?w=800'],colors:[5,2,1],sizes:['XS','S','M','L'],has3d:true,isNew:true,isTrending:false,rating:4.9,reviews:203,gradient:['#E8D0E8','#C57BC5'],icon:'👗'},
+  {id:'p6',name:'Bucket Hat',brand:'VEKLAM BASICS',desc:'Classic bucket hat in canvas. UV protective, packable, and styled for any look.',price:28,cat:'Accessories',images:['https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=800'],colors:[0,4,1],sizes:['S/M','L/XL'],has3d:false,isNew:false,isTrending:false,rating:4.4,reviews:67,gradient:['#E8E8C5','#C5C57B'],icon:'🎩'},
+];
+const USERS = [
+  {id:'u1',name:'Amira Hassan',email:'amira@veklam.com',role:'customer',initial:'A'},
+  {id:'d1',name:'Yusuf Al-Rashid',email:'yusuf@veklam.com',role:'designer',initial:'Y'},
+  {id:'d2',name:'Sara Khoury',email:'sara@veklam.com',role:'designer',initial:'S'},
+  {id:'p1',name:'Khalid Mansour',email:'khalid@veklam.com',role:'printing',initial:'K'},
+  {id:'s1',name:'Nour Al-Din',email:'nour@veklam.com',role:'superadmin',initial:'N'},
+];
+const DEMO_ORDERS = [
+  {id:'ORD-2024-001',items:1,total:42,status:'printing'},
+  {id:'ORD-2024-002',items:2,total:89,status:'pending'},
+  {id:'ORD-2024-003',items:1,total:145,status:'confirmed'},
+  {id:'ORD-2024-004',items:3,total:226,status:'delivered'},
+  {id:'ORD-2024-005',items:1,total:67,status:'shipping'},
+];
+const ADS = [
+  {tag:'Flash Sale',title:'Up to 60%\nOff Today',emoji:'🏷️',cta:'Shop →',grad:['#1a1a2e','#C8956C']},
+  {tag:'Brand Page',title:'EcoWear\nCollection',emoji:'🌿',cta:'Visit →',grad:['#2d4a22','#7BC58B']},
+  {tag:'Designer Drop',title:'Luxe Fall\nEdit 2025',emoji:'✨',cta:'Explore →',grad:['#2a1a3e','#9B7BC5']},
+  {tag:'Trending Now',title:'Viral Fits\nThis Week',emoji:'🔥',cta:'See All →',grad:['#3e1a1a','#C57B7B']},
+];
+const STATUS_COLORS = {
+  pending:'#E0A030',confirmed:'#7B9DC5',designing:'#9B7BC5',printing:'#C8956C',shipping:'#5BA8D4',delivered:'#52A869',cancelled:'#E05252'
+};
+const ROLE_INFO = {
+  customer:{color:'var(--customer-color)',emoji:'🛍️',label:'Customer'},
+  designer:{color:'var(--designer-color)',emoji:'🎨',label:'Designer Admin'},
+  printing:{color:'var(--printing-color)',emoji:'🖨️',label:'Printing Admin'},
+  superadmin:{color:'var(--super-color)',emoji:'👑',label:'Super Admin'},
+};
+
+// ════ App State ════
+const state = {
+  role: null,
+  cart: [],
+  wishlist: [],
+  orders: [],
+  designs: [],
+  selectedCategory: null,
+  currentProduct: null,
+  selectedSize: '',
+  selectedColor: null,
+  quantity: 1,
+  imgIndex: 0,
+  orderFilter: null,
+};
+
+// ════ Routing ════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+}
+function showRoles() {
+  document.getElementById('login-form').style.display = 'none';
+  document.getElementById('role-selection').style.display = 'block';
+  document.getElementById('login-sub-text').textContent = 'Select your role to continue';
+}
+function selectRole(role) {
+  state.role = role;
+  const user = USERS.find(u => u.role === role) || USERS[0];
+  state.currentUser = user;
+  if (role === 'customer') initCustomer();
+  else if (role === 'designer') initDesigner();
+  else if (role === 'printing') initPrinting();
+  else if (role === 'superadmin') initSuperAdmin();
+  showPage(role === 'superadmin' ? 'superadmin' : role === 'designer' ? 'designer' : role === 'printing' ? 'printing' : 'customer');
+}
+function logout() {
+  state.role = null; state.cart = []; state.wishlist = []; state.orders = [];
+  document.getElementById('login-form').style.display = 'block';
+  document.getElementById('role-selection').style.display = 'none';
+  document.getElementById('login-sub-text').textContent = 'Welcome back. Sign in to your account.';
+  showPage('login');
+}
+function togglePass() {
+  const inp = document.getElementById('pass-input');
+  const icon = document.getElementById('pass-icon');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  icon.className = inp.type === 'password' ? 'bi bi-eye-slash' : 'bi bi-eye';
+}
+
+// ════ Customer ════
+function initCustomer() {
+  const u = state.currentUser;
+  document.getElementById('customer-avatar').textContent = u.initial;
+  renderAds(); renderCategoryBar(); renderProducts(); renderCart();
+}
+function renderAds() {
+  const wrap = document.getElementById('ad-scroll');
+  wrap.innerHTML = ADS.map(ad => `
+    <div class="ad-card" style="background:linear-gradient(135deg,${ad.grad[0]},${ad.grad[1]})">
+      <div class="ad-bubble"></div>
+      <div class="ad-card-inner">
+        <div class="ad-emoji">${ad.emoji}</div>
+        <div class="ad-tag">${ad.tag}</div>
+        <div class="ad-title">${ad.title.replace('\n','<br>')}</div>
+        <div class="ad-cta">${ad.cta}</div>
+      </div>
+    </div>
+  `).join('');
+}
+function renderCategoryBar() {
+  const cats = ['All','T-Shirt','Hoodie','Pants','Coat','Dress','Accessories'];
+  document.getElementById('category-bar').innerHTML = cats.map(c => `
+    <div class="chip ${c === 'All' && !state.selectedCategory || c === state.selectedCategory ? 'active' : ''}" 
+         onclick="setCat('${c}')">${c}</div>
+  `).join('');
+}
+function setCat(cat) {
+  state.selectedCategory = cat === 'All' ? null : cat;
+  renderCategoryBar(); renderProducts();
+}
+function filterProducts() {
+  renderProducts();
+}
+function renderProducts() {
+  const search = document.getElementById('shop-search')?.value?.toLowerCase() || '';
+  let prods = PRODUCTS.filter(p => {
+    const matchCat = !state.selectedCategory || p.cat === state.selectedCategory;
+    const matchSearch = !search || p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+  document.getElementById('product-grid').innerHTML = prods.map((p,i) => productCardHTML(p,i)).join('');
+}
+function productCardHTML(p,i) {
+  const wishlisted = state.wishlist.some(w => w.id === p.id);
+  const imgSrc = p.images[0];
+  return `
+  <div class="product-card" style="${i % 2 === 1 ? 'margin-top:20px' : ''}" onclick="openProduct('${p.id}')">
+    <div class="product-img">
+      <img src="${imgSrc}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="product-img-placeholder" style="display:none;background:linear-gradient(135deg,${p.gradient[0]},${p.gradient[1]})">${p.icon}</div>
+      <div class="product-img-grad"></div>
+      <div class="product-badges">
+        ${p.isNew ? '<span class="badge-new">NEW</span>' : ''}
+        ${p.isTrending ? '<span class="badge-trend">🔥 TREND</span>' : ''}
+      </div>
+      ${p.has3d ? '<div class="badge-3d"><i class="bi bi-badge-ar" style="font-size:10px"></i> 3D</div>' : ''}
+      <button class="wishlist-btn" onclick="event.stopPropagation();toggleWishlist('${p.id}')" id="wbtn-${p.id}">
+        ${wishlisted ? '<i class="bi bi-heart-fill" style="color:#E05252"></i>' : '<i class="bi bi-heart" style="color:var(--soft-gray)"></i>'}
+      </button>
+    </div>
+    <div class="product-info">
+      <div class="product-name">${p.name}</div>
+      <div class="product-brand">${p.brand}</div>
+      <div class="d-flex align-items-center justify-content-between mt-2">
+        <div class="product-price">$${p.price}</div>
+        <button class="add-btn" onclick="event.stopPropagation();quickAdd('${p.id}')">+</button>
+      </div>
+    </div>
+  </div>`;
+}
+function toggleWishlist(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  const idx = state.wishlist.findIndex(w => w.id === id);
+  if (idx > -1) { state.wishlist.splice(idx,1); showToast(`Removed from saved`); }
+  else { state.wishlist.push(p); showToast('Saved! ❤️', true); }
+  renderProducts();
+  if (document.getElementById('ctab-wishlist-content').style.display !== 'none') renderWishlist();
+}
+function quickAdd(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  const size = p.sizes[1] || p.sizes[0];
+  const color = COLORS[p.colors[0]];
+  addToCart(p, size, color, 1);
+}
+function addToCart(product, size, color, qty) {
+  const existing = state.cart.find(c => c.product.id === product.id && c.size === size && c.color.name === color.name);
+  if (existing) { existing.qty += qty; }
+  else { state.cart.push({product, size, color, qty}); }
+  renderCart(); updateCartBadge();
+  showToast(`${product.name} added to cart! 🛒`);
+}
+function renderCart() {
+  const body = document.getElementById('cart-body');
+  const footer = document.getElementById('cart-footer');
+  const count = state.cart.reduce((s,c) => s+c.qty, 0);
+  const total = state.cart.reduce((s,c) => s+c.product.price*c.qty, 0);
+  document.getElementById('cart-count-label').textContent = `(${count})`;
+  if (state.cart.length === 0) {
+    body.innerHTML = `<div class="cart-empty"><div style="font-size:64px">🛒</div><div class="section-title mt-3">Your cart is empty</div><div class="text-soft mt-2">Add items to get started</div></div>`;
+    footer.innerHTML = '';
+    return;
+  }
+  body.innerHTML = state.cart.map((item,i) => `
+    <div class="cart-item">
+      <div class="cart-item-img">
+        <img src="${item.product.images[0]}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+      </div>
+      <div class="flex-grow-1">
+        <div style="font-size:14px;font-weight:700">${item.product.name}</div>
+        <div style="font-size:11px;color:var(--soft-gray)">${item.size} · ${item.color.name}</div>
+        <div class="d-flex align-items-center mt-2 gap-2">
+          <span style="font-size:14px;font-weight:800;font-family:'Playfair Display',serif">$${(item.product.price*item.qty).toFixed(2)}</span>
+          <div class="ms-auto d-flex align-items-center gap-2">
+            <button class="qty-btn" onclick="updateCartQty(${i},${item.qty-1})">−</button>
+            <span style="font-weight:700;font-size:14px">${item.qty}</span>
+            <button class="qty-btn" onclick="updateCartQty(${i},${item.qty+1})">+</button>
+            <button style="border:none;background:none;cursor:pointer;color:var(--soft-gray);font-size:16px" onclick="removeFromCart(${i})"><i class="bi bi-trash"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  footer.innerHTML = `
+    <div class="d-flex justify-content-between mb-1"><span class="text-soft">Subtotal</span><span style="font-weight:700;font-family:'Playfair Display',serif">$${total.toFixed(2)}</span></div>
+    <div class="d-flex justify-content-between mb-3"><span class="text-soft">Shipping</span><span style="color:var(--success-green);font-weight:600">Free</span></div>
+    <div class="d-flex justify-content-between mb-3" style="border-top:1px solid var(--light-border);padding-top:12px">
+      <span style="font-weight:700;font-size:16px">Total</span>
+      <span style="font-weight:900;font-size:22px;font-family:'Playfair Display',serif">$${total.toFixed(2)}</span>
+    </div>
+    <button class="btn-veklam-dark" onclick="placeOrder()">Place Order</button>
+  `;
+}
+function updateCartQty(i, qty) {
+  if (qty <= 0) { state.cart.splice(i,1); } else { state.cart[i].qty = qty; }
+  renderCart(); updateCartBadge();
+}
+function removeFromCart(i) { state.cart.splice(i,1); renderCart(); updateCartBadge(); }
+function clearCart() {
+  if (state.cart.length === 0) return;
+  if (!confirm('Clear all items from cart?')) return;
+  state.cart = []; renderCart(); updateCartBadge();
+}
+function placeOrder() {
+  if (state.cart.length === 0) return;
+  const total = state.cart.reduce((s,c) => s+c.product.price*c.qty, 0);
+  state.orders.unshift({id:'ORD-'+Date.now(),items:state.cart.length,total,status:'pending'});
+  state.cart = []; renderCart(); updateCartBadge(); closeCart();
+  showToast('🎉 Order placed successfully!', true);
+}
+function updateCartBadge() {
+  const count = state.cart.reduce((s,c) => s+c.qty, 0);
+  const badge = document.getElementById('cart-badge');
+  badge.style.display = count > 0 ? 'flex' : 'none';
+  badge.textContent = count;
+}
+function openCart() { document.getElementById('cart-sidebar').classList.add('open'); document.getElementById('cart-overlay').classList.add('open'); }
+function closeCart() { document.getElementById('cart-sidebar').classList.remove('open'); document.getElementById('cart-overlay').classList.remove('open'); }
+
+// Customer Tabs
+function customerTab(tab) {
+  ['shop','wishlist','profile'].forEach(t => {
+    document.getElementById(`ctab-${t}-content`).style.display = t === tab ? 'block' : 'none';
+    const btn = document.getElementById(`ctab-${t === 'shop' ? 'shop' : t === 'wishlist' ? 'wishlist' : 'profile'}`);
+    if (btn) btn.classList.remove('active');
+  });
+  document.getElementById(`ctab-${tab === 'profile' ? 'profile' : tab}`).classList.add('active');
+  if (tab === 'wishlist') renderWishlist();
+  if (tab === 'profile') renderProfileCustomer();
+}
+function renderWishlist() {
+  const el = document.getElementById('wishlist-content');
+  if (state.wishlist.length === 0) {
+    el.innerHTML = `<div class="text-center py-5"><div style="font-size:64px">🤍</div><div class="section-title mt-3">Nothing saved yet</div><div class="text-soft mt-2">Tap ♡ on any product to save it</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="product-grid">${state.wishlist.map((p,i) => productCardHTML(p,i)).join('')}</div>`;
+}
+function renderProfileCustomer() {
+  const u = state.currentUser;
+  const totalSpent = state.orders.reduce((s,o) => s+o.total,0);
+  const ri = ROLE_INFO[state.role];
+  document.getElementById('ctab-profile-content').innerHTML = `
+    <h2 class="section-title mb-4">Profile</h2>
+    <div class="text-center mb-4">
+      <div class="profile-avatar">${u.initial}</div>
+      <div style="font-size:20px;font-weight:800;font-family:'Playfair Display',serif">${u.name}</div>
+      <div class="text-soft" style="font-size:13px">${u.email}</div>
+      <div class="mt-2"><span class="role-badge" style="background:${ri.color.replace('var(--','').replace(')','')};background:rgba(123,157,197,.15);color:var(--customer-color)">${ri.emoji} ${ri.label}</span></div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-4"><div class="stat-card text-center"><div style="font-size:24px;font-weight:900;font-family:'Playfair Display',serif">${state.orders.length}</div><div class="stat-label">Orders</div></div></div>
+      <div class="col-4"><div class="stat-card text-center"><div style="font-size:24px;font-weight:900;font-family:'Playfair Display',serif">${state.wishlist.length}</div><div class="stat-label">Saved</div></div></div>
+      <div class="col-4"><div class="stat-card text-center"><div style="font-size:24px;font-weight:900;font-family:'Playfair Display',serif">$${totalSpent.toFixed(0)}</div><div class="stat-label">Spent</div></div></div>
+    </div>
+    ${state.orders.length > 0 ? `
+    <h3 class="playfair fw-800 mb-3" style="font-size:18px">Recent Orders</h3>
+    ${state.orders.slice(0,3).map(o => orderTileHTML(o)).join('')}
+    ` : ''}
+    <div class="section-gap"></div>
+    ${['Edit Profile','Addresses','Payment Methods','Notifications','Help & Support','Privacy Policy'].map((item,i) => `
+      <div class="list-item-veklam mb-2">
+        <i class="bi bi-${['person','geo-alt','credit-card','bell','question-circle','shield'][i]}" style="color:var(--soft-gray)"></i>
+        <span style="font-size:14px;font-weight:500">${item}</span>
+        <i class="bi bi-chevron-right ms-auto" style="color:var(--soft-gray);font-size:12px"></i>
+      </div>
+    `).join('')}
+    <div class="section-gap"></div>
+    <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
+  `;
+}
+function orderTileHTML(o) {
+  const sc = STATUS_COLORS[o.status] || '#9A8F82';
+  return `<div class="order-tile mb-2 order-row">
+    <div class="flex-grow-1">
+      <div style="font-size:12px;font-weight:700">${o.id}</div>
+      <div style="font-size:12px;color:var(--soft-gray)">${o.items} item(s) · $${o.total.toFixed ? o.total.toFixed(2) : o.total}</div>
+    </div>
+    <span class="order-chip" style="background:${sc}22;color:${sc}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span>
+  </div>`;
+}
+
+// Product Modal
+function openProduct(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  state.currentProduct = p;
+  state.selectedSize = p.sizes[1] || p.sizes[0];
+  state.selectedColor = COLORS[p.colors[0]];
+  state.quantity = 1;
+  state.imgIndex = 0;
+  renderProductModal(p);
+  document.getElementById('product-modal').classList.add('open');
+}
+function renderProductModal(p) {
+  const wishlisted = state.wishlist.some(w => w.id === p.id);
+  const stars = Array.from({length:5},(_,i) => `<i class="bi bi-star${i < Math.floor(p.rating) ? '-fill' : ''}" style="color:#E8B84B;font-size:12px"></i>`).join('');
+  document.getElementById('modal-sheet').innerHTML = `
+    <div class="modal-img-wrap">
+      <img src="${p.images[state.imgIndex]}" alt="${p.name}" id="modal-main-img" onerror="this.style.display='none'">
+      <div class="modal-top-btns">
+        <button class="modal-top-btn" onclick="closeModal()"><i class="bi bi-arrow-left" style="font-size:14px"></i></button>
+        <div class="flex-grow-1"></div>
+        <button class="modal-top-btn" onclick="toggleWishlist('${p.id}')" id="modal-wish-btn">
+          <i class="bi bi-heart${wishlisted?'-fill':''}" style="color:${wishlisted?'#E05252':'var(--charcoal)'}"></i>
+        </button>
+        <button class="modal-top-btn ms-2"><i class="bi bi-share" style="font-size:14px"></i></button>
+      </div>
+    </div>
+    ${p.images.length > 1 ? `<div class="img-dots" id="img-dots">${p.images.map((_,i)=>`<div class="img-dot ${i===state.imgIndex?'active':''}" onclick="changeModalImg('${p.id}',${i})"></div>`).join('')}</div>` : ''}
+    <div style="padding:20px 20px 0">
+      <div class="d-flex align-items-start justify-content-between mb-1">
+        <div>
+          <h2 class="playfair fw-800" style="font-size:22px">${p.name}</h2>
+          <div class="text-soft" style="font-size:13px">${p.brand}</div>
+          <div class="d-flex align-items-center gap-2 mt-1">${stars}<span style="font-size:12px;color:var(--soft-gray)">${p.rating} (${p.reviews})</span></div>
+        </div>
+        <span style="font-size:28px;font-weight:900;font-family:'Playfair Display',serif">$${p.price}</span>
+      </div>
+      <hr style="border-color:var(--light-border);margin:16px 0">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">Color</div>
+      <div class="d-flex gap-2 mb-4" id="modal-colors">
+        ${p.colors.map(ci => {
+          const c = COLORS[ci];
+          const sel = state.selectedColor && c.name === state.selectedColor.name;
+          return `<div class="color-dot ${sel?'active':''}" style="background:${c.hex}" title="${c.name}" onclick="selectColor('${c.name}','${c.hex}')">
+            ${sel ? '<i class="bi bi-check" style="color:#fff;font-size:12px"></i>' : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div style="font-size:13px;font-weight:700">Size</div>
+        <span style="font-size:12px;color:var(--caramel);font-weight:600;cursor:pointer" onclick="showSizeGuide()">Size guide →</span>
+      </div>
+      <div class="d-flex flex-wrap gap-2 mb-4" id="modal-sizes">
+        ${p.sizes.map(s => `<button class="size-btn ${s===state.selectedSize?'active':''}" onclick="selectSize('${s}')">${s}</button>`).join('')}
+      </div>
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <div style="font-size:13px;font-weight:700">Quantity</div>
+        <div class="d-flex align-items-center gap-3">
+          <button class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span id="modal-qty" style="font-weight:700;font-size:16px">${state.quantity}</span>
+          <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+      <hr style="border-color:var(--light-border);margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px">Description</div>
+      <p style="font-size:13px;color:var(--soft-gray);line-height:1.7;margin-bottom:80px">${p.desc}</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-veklam-dark flex-fill" onclick="addFromModal()">Add to Cart</button>
+      <button class="btn-veklam-caramel flex-fill" onclick="buyNow()">Buy Now</button>
+    </div>
+  `;
+}
+function changeModalImg(id, idx) {
+  state.imgIndex = idx;
+  const p = PRODUCTS.find(x => x.id === id);
+  document.getElementById('modal-main-img').src = p.images[idx];
+  document.querySelectorAll('.img-dot').forEach((d,i) => d.classList.toggle('active', i === idx));
+}
+function selectSize(s) {
+  state.selectedSize = s;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.toggle('active', b.textContent === s));
+}
+function selectColor(name, hex) {
+  state.selectedColor = {name, hex};
+  document.querySelectorAll('.color-dot').forEach(d => {
+    const sel = d.getAttribute('style').includes(hex);
+    d.classList.toggle('active', sel);
+    d.innerHTML = sel ? '<i class="bi bi-check" style="color:#fff;font-size:12px"></i>' : '';
+  });
+}
+function changeQty(delta) {
+  state.quantity = Math.max(1, state.quantity + delta);
+  document.getElementById('modal-qty').textContent = state.quantity;
+}
+function addFromModal() {
+  const p = state.currentProduct;
+  if (!p || !state.selectedColor) return;
+  addToCart(p, state.selectedSize, state.selectedColor, state.quantity);
+}
+function buyNow() {
+  addFromModal(); closeModal(); openCart();
+}
+function closeModal() { document.getElementById('product-modal').classList.remove('open'); }
+function showSizeGuide() {
+  alert('Size Guide (cm)\nXS: Chest 82–87, Waist 62–67\nS: Chest 87–92, Waist 67–72\nM: Chest 92–97, Waist 72–77\nL: Chest 97–102, Waist 77–82\nXL: Chest 102–107, Waist 82–87');
+}
+
+// ════ Designer ════
+let designerCharts = {};
+function initDesigner() {
+  const u = state.currentUser;
+  document.getElementById('designer-avatar').textContent = u.initial;
+  renderDesignerDashboard();
+  renderDesignerDesigns();
+  renderDesignerUpload();
+  renderDesignerProfile();
+}
+function designerTab(tab) {
+  ['dashboard','designs','upload','dprofile'].forEach(t => {
+    document.getElementById(`dtab-${t}-content`).style.display = t === tab ? 'block' : 'none';
+    document.getElementById(`dtab-${t}`).classList.remove('active');
+  });
+  document.getElementById(`dtab-${tab}`).classList.add('active');
+}
+function renderDesignerDashboard() {
+  const mine = state.designs;
+  const published = mine.filter(d => d.status === 'published').length;
+  const review = mine.filter(d => d.status === 'review').length;
+  document.getElementById('dtab-dashboard-content').innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <div class="text-soft" style="font-size:12px;font-weight:500">Designer Studio</div>
+        <div class="playfair fw-900" style="font-size:30px;line-height:1.1">Veklam<span style="color:var(--designer-color)">{ 🎨</span></div>
+      </div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(155,123,197,.12)"><i class="bi bi-palette" style="color:var(--designer-color)"></i></div><div class="stat-value" style="color:var(--designer-color)">${mine.length}</div><div class="stat-label">Total Designs</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(82,168,105,.12)"><i class="bi bi-check-circle" style="color:var(--success-green)"></i></div><div class="stat-value" style="color:var(--success-green)">${published}</div><div class="stat-label">Published</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(224,160,48,.12)"><i class="bi bi-clock" style="color:#E0A030"></i></div><div class="stat-value" style="color:#E0A030">${review}</div><div class="stat-label">Under Review</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(200,149,108,.12)"><i class="bi bi-wallet2" style="color:var(--caramel)"></i></div><div class="stat-value" style="color:var(--caramel)">$0</div><div class="stat-label">Revenue</div><div class="stat-sub">This month</div></div></div>
+    </div>
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h3 class="playfair fw-800" style="font-size:18px">My Designs</h3>
+      <span style="font-size:13px;color:var(--caramel);cursor:pointer" onclick="designerTab('designs')">View all →</span>
+    </div>
+    ${mine.length === 0 ? `<div class="card-veklam text-center py-4"><div style="font-size:36px">🎨</div><div class="text-soft mt-2">Upload your first design!</div></div>` 
+    : mine.slice(0,3).map(d => designTileHTML(d)).join('')}
+  `;
+}
+function renderDesignerDesigns() {
+  document.getElementById('dtab-designs-content').innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="section-title">My Designs</h2>
+      <span class="px-3 py-1 rounded-pill" style="background:rgba(155,123,197,.12);color:var(--designer-color);font-size:11px;font-weight:700">${state.designs.length} total</span>
+    </div>
+    <div id="design-list-wrap">
+      ${state.designs.length === 0 ? `<div class="text-center py-5"><div style="font-size:64px">🖼️</div><div class="section-title mt-3">No designs yet</div><div class="text-soft mt-2">Upload your first design</div></div>`
+      : state.designs.map(d => designTileHTML(d)).join('')}
+    </div>
+  `;
+}
+function designTileHTML(d) {
+  const statusMeta = {
+    draft:{color:'var(--soft-gray)',label:'Draft'},
+    review:{color:'#E0A030',label:'Under Review'},
+    approved:{color:'var(--success-green)',label:'Approved'},
+    rejected:{color:'var(--error-red)',label:'Rejected'},
+    published:{color:'var(--designer-color)',label:'Published'},
+  };
+  const sm = statusMeta[d.status] || statusMeta.draft;
+  return `<div class="design-tile">
+    <div class="design-icon">🎨</div>
+    <div class="flex-grow-1">
+      <div style="font-size:14px;font-weight:700">${d.title}</div>
+      <div style="font-size:11px;color:var(--soft-gray)">${d.cat}</div>
+    </div>
+    <span class="order-chip" style="background:${sm.color.replace('var(','').replace(')','').replace('-','0')}22;color:${sm.color}">${sm.label}</span>
+  </div>`;
+}
+function renderDesignerUpload() {
+  document.getElementById('dtab-upload-content').innerHTML = `
+    <h2 class="section-title mb-1">Upload Design</h2>
+    <p class="text-soft mb-4" style="font-size:13px">Create a new product design for review</p>
+    <div class="upload-zone mb-4" onclick="showToast('File upload coming soon!')">
+      <i class="bi bi-cloud-upload" style="font-size:42px;color:var(--soft-gray)"></i>
+      <div style="font-size:14px;font-weight:600;margin-top:8px">Upload design files</div>
+      <div class="text-soft" style="font-size:11px">PNG, JPG, GLB up to 50MB</div>
+    </div>
+    <div class="mb-3">
+      <input type="text" class="form-control-veklam" placeholder="Design title" id="design-title" style="padding:12px 16px">
+    </div>
+    <div class="mb-3">
+      <textarea class="form-control-veklam" placeholder="Describe the design…" rows="3" id="design-desc" style="padding:12px 16px;resize:none"></textarea>
+    </div>
+    <div class="mb-3">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px">Category</div>
+      <div id="cat-chips">
+        ${['T-Shirt','Hoodie','Pants','Coat','Dress','Accessories'].map((c,i) => `<span class="tag-chip ${i===0?'active':''}" onclick="selectDesignCat(this,'${c}')">${c}</span>`).join('')}
+      </div>
+    </div>
+    <div class="mb-4">
+      <input type="number" class="form-control-veklam" placeholder="$ Suggested price" id="design-price" style="padding:12px 16px">
+    </div>
+    <button class="btn-veklam-dark" style="background:var(--designer-color);width:100%;padding:14px" onclick="submitDesign()">Submit for Review</button>
+    <div id="design-success" style="display:none;text-align:center;padding:40px 0">
+      <div style="font-size:64px">🎉</div>
+      <div class="section-title mt-3">Design Submitted!</div>
+      <div class="text-soft mt-2">Your design is under review</div>
+      <button class="btn-veklam-dark mt-4" onclick="resetUpload()">Upload Another</button>
+    </div>
+  `;
+}
+let selectedDesignCat = 'T-Shirt';
+function selectDesignCat(el, cat) {
+  selectedDesignCat = cat;
+  document.querySelectorAll('.tag-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+function submitDesign() {
+  const title = document.getElementById('design-title').value.trim();
+  if (!title) { showToast('Please enter a design title'); return; }
+  const design = {
+    id: 'D-'+Date.now(),
+    designerId: state.currentUser.id,
+    title,
+    desc: document.getElementById('design-desc').value,
+    price: parseFloat(document.getElementById('design-price').value) || 0,
+    cat: selectedDesignCat,
+    status: 'review',
+    uploadedAt: new Date(),
+  };
+  state.designs.unshift(design);
+  document.getElementById('dtab-upload-content').querySelector('form') && null;
+  document.getElementById('design-success').style.display = 'block';
+  document.querySelectorAll('#dtab-upload-content > *:not(#design-success)').forEach(el => el.style.display = 'none');
+  renderDesignerDashboard(); renderDesignerDesigns();
+}
+function resetUpload() { renderDesignerUpload(); }
+function renderDesignerProfile() {
+  const u = state.currentUser;
+  document.getElementById('dtab-dprofile-content').innerHTML = `
+    <h2 class="section-title mb-4">Profile</h2>
+    <div class="text-center mb-4">
+      <div class="profile-avatar" style="background:var(--designer-color)">${u.initial}</div>
+      <div style="font-size:20px;font-weight:800;font-family:'Playfair Display',serif">${u.name}</div>
+      <div class="text-soft" style="font-size:13px">${u.email}</div>
+      <div class="mt-2"><span class="role-badge" style="background:rgba(155,123,197,.15);color:var(--designer-color)">🎨 Designer Admin</span></div>
+    </div>
+    <button class="logout-btn mt-4" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
+  `;
+}
+
+// ════ Printing ════
+let orderFilter = null;
+function initPrinting() {
+  const u = state.currentUser;
+  document.getElementById('printing-avatar').textContent = u.initial;
+  renderPrintDashboard();
+  renderPrintOrders();
+  renderPrintQueue();
+  renderPrintProfile();
+}
+function printingTab(tab) {
+  ['dashboard','orders','queue','pprofile'].forEach(t => {
+    document.getElementById(`ptab-${t}-content`).style.display = t === tab ? 'block' : 'none';
+    document.getElementById(`ptab-${t}`).classList.remove('active');
+  });
+  document.getElementById(`ptab-${tab}`).classList.add('active');
+}
+function renderPrintDashboard() {
+  const orders = DEMO_ORDERS;
+  const printing = orders.filter(o => o.status === 'printing').length;
+  const pending = orders.filter(o => o.status === 'pending').length;
+  const delivered = orders.filter(o => o.status === 'delivered').length;
+  document.getElementById('ptab-dashboard-content').innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <div class="text-soft" style="font-size:12px;font-weight:500">Print Studio</div>
+        <div class="playfair fw-900" style="font-size:30px;line-height:1.1">Veklam<span style="color:var(--printing-color)">{ 🖨️</span></div>
+      </div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(123,197,139,.12)"><i class="bi bi-receipt" style="color:var(--printing-color)"></i></div><div class="stat-value" style="color:var(--printing-color)">${orders.length}</div><div class="stat-label">Total Orders</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(224,160,48,.12)"><i class="bi bi-printer" style="color:#E0A030"></i></div><div class="stat-value" style="color:#E0A030">${printing}</div><div class="stat-label">Printing</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(123,157,197,.12)"><i class="bi bi-hourglass" style="color:var(--customer-color)"></i></div><div class="stat-value" style="color:var(--customer-color)">${pending}</div><div class="stat-label">Pending</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(82,168,105,.12)"><i class="bi bi-check-circle" style="color:var(--success-green)"></i></div><div class="stat-value" style="color:var(--success-green)">${delivered}</div><div class="stat-label">Completed</div></div></div>
+    </div>
+    <h3 class="playfair fw-800 mb-3" style="font-size:18px">Recent Orders</h3>
+    ${orders.slice(0,5).map(o => printOrderTileHTML(o,false)).join('')}
+  `;
+}
+function renderPrintOrders() {
+  const statuses = ['All','pending','confirmed','designing','printing','shipping','delivered','cancelled'];
+  document.getElementById('ptab-orders-content').innerHTML = `
+    <h2 class="section-title mb-3">Order Management</h2>
+    <div class="chip-bar mb-4" id="order-filter-bar">
+      ${statuses.map(s => `<div class="chip ${(!orderFilter&&s==='All')||orderFilter===s?'active':''}" onclick="setOrderFilter('${s}')">${s.charAt(0).toUpperCase()+s.slice(1)}</div>`).join('')}
+    </div>
+    <div id="order-list">
+      ${(orderFilter&&orderFilter!=='All' ? DEMO_ORDERS.filter(o=>o.status===orderFilter) : DEMO_ORDERS).map(o=>printOrderTileHTML(o,true)).join('')}
+    </div>
+  `;
+}
+function setOrderFilter(s) {
+  orderFilter = s === 'All' ? null : s;
+  renderPrintOrders();
+}
+function renderPrintQueue() {
+  const queue = DEMO_ORDERS.filter(o => o.status === 'printing' || o.status === 'confirmed');
+  document.getElementById('ptab-queue-content').innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="section-title">Print Queue</h2>
+      <span class="px-3 py-1 rounded-pill" style="background:rgba(123,197,139,.12);color:var(--printing-color);font-size:11px;font-weight:700">${queue.length} active</span>
+    </div>
+    ${queue.length === 0 ? `<div class="text-center py-5"><div style="font-size:64px">✅</div><div class="section-title mt-3">Print queue is clear!</div></div>`
+    : queue.map(o => printOrderTileHTML(o, false, true)).join('')}
+  `;
+}
+function printOrderTileHTML(o, expanded=false, showActions=false) {
+  const sc = STATUS_COLORS[o.status] || '#9A8F82';
+  return `<div class="order-tile mb-2">
+    <div class="order-row">
+      <div class="flex-grow-1">
+        <div style="font-size:13px;font-weight:700">${o.id}</div>
+        <div style="font-size:11px;color:var(--soft-gray)">${o.items} item(s) · $${o.total.toFixed ? o.total.toFixed(2) : o.total}</div>
+      </div>
+      <span class="order-chip" style="background:${sc}22;color:${sc}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span>
+    </div>
+    ${showActions ? `
+    <div class="d-flex gap-2 mt-3">
+      <button class="btn-outline-veklam flex-fill" style="padding:8px" onclick="showToast('Details coming soon!')">View Details</button>
+      <button class="btn-veklam-dark flex-fill" style="background:var(--printing-color);padding:8px" onclick="showToast('Order marked done ✓', true)">Mark Done</button>
+    </div>` : ''}
+  </div>`;
+}
+function renderPrintProfile() {
+  const u = state.currentUser;
+  document.getElementById('ptab-pprofile-content').innerHTML = `
+    <h2 class="section-title mb-4">Profile</h2>
+    <div class="text-center mb-4">
+      <div class="profile-avatar" style="background:var(--printing-color)">${u.initial}</div>
+      <div style="font-size:20px;font-weight:800;font-family:'Playfair Display',serif">${u.name}</div>
+      <div class="text-soft" style="font-size:13px">${u.email}</div>
+      <div class="mt-2"><span class="role-badge" style="background:rgba(123,197,139,.15);color:var(--printing-color)">🖨️ Printing Admin</span></div>
+    </div>
+    <button class="logout-btn mt-4" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
+  `;
+}
+
+// ════ Super Admin ════
+let revenueChart = null, salesChart = null;
+function initSuperAdmin() {
+  const u = state.currentUser;
+  document.getElementById('super-avatar').textContent = u.initial;
+  renderSuperOverview();
+  renderSuperUsers();
+  renderSuperProducts();
+  renderSuperAnalytics();
+}
+function superTab(tab) {
+  ['overview','users','products','analytics'].forEach(t => {
+    document.getElementById(`stab-${t}-content`).style.display = t === tab ? 'block' : 'none';
+    document.getElementById(`stab-${t}`).classList.remove('active');
+  });
+  document.getElementById(`stab-${tab}`).classList.add('active');
+  if (tab === 'analytics') setTimeout(initCharts, 100);
+  if (tab === 'overview') setTimeout(initOverviewChart, 100);
+}
+function renderSuperOverview() {
+  const totalOrders = DEMO_ORDERS.length + state.orders.length;
+  document.getElementById('stab-overview-content').innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <div class="text-soft" style="font-size:12px;font-weight:500">Super Admin</div>
+        <div class="playfair fw-900" style="font-size:30px;line-height:1.1">Veklam<span style="color:var(--super-color)">{ 👑</span></div>
+      </div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(200,149,108,.12)"><i class="bi bi-currency-dollar" style="color:var(--super-color)"></i></div><div class="stat-value" style="color:var(--super-color)">$12.8k</div><div class="stat-label">Total Revenue</div><div class="stat-sub">↑ 12% this month</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(123,157,197,.12)"><i class="bi bi-people" style="color:var(--customer-color)"></i></div><div class="stat-value" style="color:var(--customer-color)">${USERS.length}</div><div class="stat-label">Total Users</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(123,197,139,.12)"><i class="bi bi-box" style="color:var(--printing-color)"></i></div><div class="stat-value" style="color:var(--printing-color)">${PRODUCTS.length}</div><div class="stat-label">Products</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(155,123,197,.12)"><i class="bi bi-receipt" style="color:var(--designer-color)"></i></div><div class="stat-value" style="color:var(--designer-color)">${totalOrders}</div><div class="stat-label">Orders</div></div></div>
+    </div>
+    <div class="chart-card mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 class="playfair fw-700" style="font-size:16px">Revenue</h4>
+        <span class="px-2 py-1 rounded" style="background:rgba(200,149,108,.12);color:var(--super-color);font-size:10px;font-weight:600">Last 6 months</span>
+      </div>
+      <div style="height:160px"><canvas id="overview-chart"></canvas></div>
+    </div>
+    <h3 class="playfair fw-800 mb-3" style="font-size:18px">Platform Users</h3>
+    ${USERS.map(u => userTileHTML(u, false)).join('')}
+    <div class="section-gap"></div>
+    <h3 class="playfair fw-800 mb-3" style="font-size:18px">Recent Orders</h3>
+    ${DEMO_ORDERS.slice(0,3).map(o => orderTileHTML(o)).join('')}
+    <div class="section-gap"></div>
+    <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>
+  `;
+  setTimeout(initOverviewChart, 100);
+}
+function initOverviewChart() {
+  const canvas = document.getElementById('overview-chart');
+  if (!canvas) return;
+  if (revenueChart) { revenueChart.destroy(); revenueChart = null; }
+  revenueChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: ['Oct','Nov','Dec','Jan','Feb','Mar'],
+      datasets: [{
+        data: [1.8,2.4,2.1,3.2,2.8,4.1],
+        borderColor: '#C8956C', backgroundColor: 'rgba(200,149,108,.1)',
+        borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0,
+      }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}},y:{display:false,grid:{display:false}}} }
+  });
+}
+function userTileHTML(u, expanded=false) {
+  const ri = ROLE_INFO[u.role] || ROLE_INFO.customer;
+  const roleColors = {customer:'var(--customer-color)',designer:'var(--designer-color)',printing:'var(--printing-color)',superadmin:'var(--super-color)'};
+  const rc = roleColors[u.role] || 'var(--soft-gray)';
+  return `<div class="user-tile mb-2">
+    <div class="user-avatar-sm" style="background:${rc.replace('var(--','').replace(')','').replace(/[a-z-]/g,c=>'ABCDEF'.includes(c.toUpperCase())?c:'')}00;background:rgba(200,149,108,.15);color:${rc}">${u.initial}</div>
+    <div class="flex-grow-1">
+      <div style="font-size:14px;font-weight:700">${u.name}</div>
+      <div style="font-size:11px;color:var(--soft-gray)">${u.email}</div>
+    </div>
+    <span class="role-badge" style="background:${rc}22;color:${rc}">${ri.emoji} ${ri.label}</span>
+    ${expanded ? `<button class="ms-2" style="border:none;background:none;color:var(--soft-gray);cursor:pointer" onclick="showToast('Options: Edit, Suspend, Delete')"><i class="bi bi-three-dots-vertical"></i></button>` : ''}
+  </div>`;
+}
+function renderSuperUsers() {
+  document.getElementById('stab-users-content').innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="section-title">Users</h2>
+      <button class="btn-veklam-dark" style="padding:8px 16px;font-size:12px;width:auto" onclick="showToast('Add User form coming soon!')">+ Add User</button>
+    </div>
+    ${USERS.map(u => userTileHTML(u, true)).join('')}
+  `;
+}
+function renderSuperProducts() {
+  document.getElementById('stab-products-content').innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="section-title">Products</h2>
+      <span class="text-soft" style="font-size:13px">${PRODUCTS.length} items</span>
+    </div>
+    ${PRODUCTS.map(p => `
+      <div class="product-row">
+        <div class="product-thumb">
+          <img src="${p.images[0]}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+        </div>
+        <div class="flex-grow-1">
+          <div style="font-size:13px;font-weight:700">${p.name}</div>
+          <div style="font-size:11px;color:var(--soft-gray)">${p.cat} · $${p.price}</div>
+        </div>
+        <button style="border:none;background:none;color:var(--soft-gray);cursor:pointer" onclick="showToast('Options: Edit, Delete')"><i class="bi bi-three-dots-vertical"></i></button>
+      </div>
+    `).join('')}
+  `;
+}
+function renderSuperAnalytics() {
+  document.getElementById('stab-analytics-content').innerHTML = `
+    <h2 class="section-title mb-4">Analytics</h2>
+    <div class="chart-card mb-4">
+      <h4 class="playfair fw-700 mb-3" style="font-size:16px">Sales by Category</h4>
+      <div style="height:200px"><canvas id="sales-chart"></canvas></div>
+    </div>
+    <div class="row g-3">
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(82,168,105,.12)"><i class="bi bi-graph-up" style="color:var(--success-green)"></i></div><div class="stat-value" style="color:var(--success-green)">3.2%</div><div class="stat-label">Conversion Rate</div><div class="stat-sub">↑ 0.5% vs last month</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(200,149,108,.12)"><i class="bi bi-bag" style="color:var(--caramel)"></i></div><div class="stat-value" style="color:var(--caramel)">$78</div><div class="stat-label">Avg Order Value</div><div class="stat-sub">↑ $6 vs last month</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(123,157,197,.12)"><i class="bi bi-arrow-repeat" style="color:var(--customer-color)"></i></div><div class="stat-value" style="color:var(--customer-color)">2.1%</div><div class="stat-label">Return Rate</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(155,123,197,.12)"><i class="bi bi-person-plus" style="color:var(--designer-color)"></i></div><div class="stat-value" style="color:var(--designer-color)">+124</div><div class="stat-label">New Users</div><div class="stat-sub">This month</div></div></div>
+    </div>
+  `;
+  setTimeout(initCharts, 100);
+}
+function initCharts() {
+  const canvas = document.getElementById('sales-chart');
+  if (!canvas) return;
+  if (salesChart) { salesChart.destroy(); salesChart = null; }
+  salesChart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: ['Tee','Hoodie','Pants','Coat','Dress','Acc'],
+      datasets: [{
+        data: [4.2,3.1,2.8,3.8,2.1,1.4],
+        backgroundColor: ['#7B9DC5','#9B7BC5','#7BC58B','#C8956C','#C5C57B','#7BC5C5'],
+        borderRadius: 8,
+        borderWidth: 0,
+      }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}},y:{display:false,grid:{display:false}}} }
+  });
+}
+
+// ════ Toast ════
+function showToast(msg, success=false) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast-veklam${success?' success':''}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ════ Init ════
+document.addEventListener('DOMContentLoaded', () => {});
+</script>
+</body>
+</html>
