@@ -1,0 +1,2411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Naxshin — Print & Design</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, where, orderBy, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // ── Firebase Config ── Replace with your own config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEMO_REPLACE_WITH_YOUR_KEY",
+      authDomain: "naxshin-demo.firebaseapp.com",
+      projectId: "naxshin-demo",
+      storageBucket: "naxshin-demo.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef"
+    };
+
+    // Initialize Firebase
+    let app, auth, db;
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+    } catch(e) {
+      console.warn('Firebase init failed (demo mode):', e.message);
+    }
+
+    // Expose to global scope for use in non-module scripts
+    window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, doc, setDoc, getDoc, collection, addDoc, getDocs, query, where, orderBy, serverTimestamp, updateDoc };
+  </script>
+
+  <style>
+    :root {
+      --cream: #F7F3EE;
+      --warm-white: #EDE8DC;
+      --caramel: #B87333;
+      --dark-caramel: #8B5A1A;
+      --charcoal: #1C1A18;
+      --soft-gray: #8A8278;
+      --light-border: #DDD6CC;
+      --error-red: #C0392B;
+      --success-green: #27AE60;
+      --customer-color: #6B8FAD;
+      --designer-color: #8E6BAD;
+      --printing-color: #5B9A6B;
+      --super-color: #B87333;
+      --naxshin-red: #8B2020;
+      --naxshin-green: #1E3D1E;
+      --naxshin-gold: #B87333;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; }
+    .cormorant { font-family: 'Cormorant Garamond', serif; }
+
+    /* ── Pages ── */
+    .page { display: none; min-height: 100vh; }
+    .page.active { display: block; }
+
+    /* ─────────────────────────────
+       LANDING PAGE
+    ───────────────────────────── */
+    #page-landing {
+      background: var(--cream);
+      position: relative;
+      overflow: hidden;
+    }
+    .landing-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      position: sticky;
+      top: 0;
+      background: rgba(247,243,238,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--light-border);
+      z-index: 100;
+    }
+    .landing-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .landing-logo img {
+      height: 52px;
+      width: auto;
+    }
+    .landing-logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--charcoal);
+    }
+    .landing-logo-sub {
+      font-size: 9px;
+      letter-spacing: 4px;
+      color: var(--naxshin-gold);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .landing-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-login {
+      background: var(--charcoal);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 24px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-login:hover { opacity: .8; }
+    .btn-signup-outline {
+      background: transparent;
+      color: var(--charcoal);
+      border: 1.5px solid var(--charcoal);
+      border-radius: 12px;
+      padding: 9px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-signup-outline:hover { background: var(--charcoal); color: #fff; }
+
+    /* Hero */
+    .hero-section {
+      padding: 60px 40px 40px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(184,115,51,.1);
+      color: var(--naxshin-gold);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(44px, 7vw, 84px);
+      font-weight: 700;
+      line-height: 1.05;
+      color: var(--charcoal);
+      margin-bottom: 20px;
+    }
+    .hero-title span { color: var(--naxshin-gold); }
+    .hero-subtitle {
+      font-size: 16px;
+      color: var(--soft-gray);
+      max-width: 500px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-hero-primary {
+      background: var(--charcoal);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 32px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-hero-primary:hover { background: var(--naxshin-gold); transform: translateY(-2px); }
+    .btn-hero-secondary {
+      background: transparent;
+      color: var(--charcoal);
+      border: 1.5px solid var(--light-border);
+      border-radius: 14px;
+      padding: 14px 32px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-hero-secondary:hover { border-color: var(--charcoal); }
+
+    /* Featured products strip */
+    .featured-strip {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 24px 40px;
+      scrollbar-width: none;
+    }
+    .featured-strip::-webkit-scrollbar { display: none; }
+    .featured-card {
+      min-width: 200px;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all .25s;
+    }
+    .featured-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.1); }
+    .featured-card-img {
+      height: 220px;
+      overflow: hidden;
+    }
+    .featured-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .featured-card-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 64px;
+    }
+    .featured-card-info { padding: 12px; }
+    .featured-card-name { font-size: 14px; font-weight: 700; }
+    .featured-card-price { font-size: 16px; font-weight: 800; color: var(--naxshin-gold); font-family: 'Cormorant Garamond', serif; }
+
+    /* Trending Slider Section */
+    .landing-section { padding: 40px 40px 0; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .section-title-lg {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    /* Trending Slider */
+    .trending-slider-wrap {
+      position: relative;
+    }
+    .trending-slider {
+      display: flex;
+      gap: 16px;
+      overflow: hidden;
+    }
+    .trending-card {
+      min-width: calc(33.333% - 11px);
+      flex-shrink: 0;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+      cursor: pointer;
+      transition: all .3s ease;
+    }
+    @media (max-width: 768px) {
+      .trending-card { min-width: calc(80% - 8px); }
+    }
+    .trending-card-img { height: 260px; overflow: hidden; position: relative; }
+    .trending-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .trending-card-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+    .trend-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--naxshin-gold);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      letter-spacing: .5px;
+    }
+    .trending-card-info { padding: 16px; }
+    .trending-card-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; }
+    .trending-card-brand { font-size: 11px; color: var(--soft-gray); margin-bottom: 8px; }
+    .trending-card-price { font-size: 18px; font-weight: 800; color: var(--charcoal); }
+    .trending-card-btn {
+      float: right;
+      background: var(--charcoal);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: opacity .2s;
+    }
+    .trending-card-btn:hover { opacity: .8; }
+
+    /* Slider dots & arrows */
+    .slider-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .slider-arrow {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--charcoal);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: opacity .2s;
+    }
+    .slider-arrow:hover { opacity: .7; }
+    .slider-dots {
+      display: flex;
+      gap: 6px;
+    }
+    .slider-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--light-border);
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+    }
+    .slider-dot.active {
+      width: 24px;
+      background: var(--charcoal);
+    }
+
+    /* Ads Banner Section */
+    .ads-section { padding: 40px; }
+    .ads-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .ads-grid { grid-template-columns: 1fr; } }
+    .ad-banner {
+      border-radius: 20px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      min-height: 120px;
+      transition: transform .2s;
+    }
+    .ad-banner:hover { transform: translateY(-2px); }
+    .ad-banner-label {
+      font-size: 9px;
+      color: rgba(255,255,255,.6);
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .ad-banner-label.dark { color: rgba(0,0,0,.4); }
+    .ad-banner-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .ad-banner-title.dark { color: var(--charcoal); }
+    .ad-banner-cta {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(255,255,255,.2);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+    .ad-banner-cta.dark { background: rgba(0,0,0,.1); color: var(--charcoal); }
+    .ad-banner-emoji {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 32px;
+    }
+    .ad-sponsored {
+      font-size: 10px;
+      color: var(--soft-gray);
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    /* Partner CTA */
+    .partner-section {
+      margin: 0 40px 60px;
+      background: var(--charcoal);
+      border-radius: 24px;
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .partner-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      color: #fff;
+      font-weight: 700;
+    }
+    .partner-section p { color: rgba(255,255,255,.6); margin-top: 8px; font-size: 14px; }
+    .btn-partner {
+      background: var(--naxshin-gold);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: opacity .2s;
+      white-space: nowrap;
+    }
+    .btn-partner:hover { opacity: .85; }
+
+    /* ─────────────────────────────
+       AUTH PAGES (Login/Signup)
+    ───────────────────────────── */
+    #page-login, #page-signup {
+      background: var(--cream);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 0;
+    }
+    .auth-wrap {
+      width: 100%;
+      max-width: 460px;
+      padding: 50px 28px 60px;
+    }
+    .auth-back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: none;
+      border: none;
+      color: var(--soft-gray);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      margin-bottom: 36px;
+      padding: 0;
+      transition: color .2s;
+    }
+    .auth-back-btn:hover { color: var(--charcoal); }
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .auth-logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+    .auth-logo-sub {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: var(--naxshin-gold);
+      font-weight: 600;
+    }
+    .auth-subtitle {
+      font-size: 14px;
+      color: var(--soft-gray);
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .form-control-naxshin {
+      background: var(--warm-white);
+      border: 1.5px solid var(--light-border);
+      border-radius: 14px;
+      padding: 12px 16px 12px 44px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--charcoal);
+      width: 100%;
+      transition: border-color .2s;
+    }
+    .form-control-naxshin:focus { outline: none; border-color: var(--naxshin-gold); box-shadow: 0 0 0 3px rgba(184,115,51,.12); }
+    .input-wrap { position: relative; }
+    .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--soft-gray); font-size: 16px; }
+    .input-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--soft-gray); cursor: pointer; font-size: 16px; border: none; background: none; }
+    .btn-auth-primary {
+      background: var(--charcoal);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      width: 100%;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+    .btn-auth-primary:hover { opacity: .85; }
+    .btn-social {
+      background: #fff;
+      border: 1.5px solid var(--light-border);
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all .2s;
+      color: var(--charcoal);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      width: 100%;
+    }
+    .btn-social:hover { border-color: var(--charcoal); }
+    .divider-or { display: flex; align-items: center; gap: 16px; color: var(--soft-gray); font-size: 13px; }
+    .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1.5px; background: var(--light-border); }
+
+    /* Signup role selector */
+    .signup-role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .signup-role-card {
+      border: 1.5px solid var(--light-border);
+      border-radius: 14px;
+      padding: 14px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: #fff;
+    }
+    .signup-role-card:hover { border-color: var(--naxshin-gold); }
+    .signup-role-card.selected { border-color: var(--charcoal); background: var(--warm-white); }
+    .signup-role-card .role-emoji { font-size: 24px; display: block; margin-bottom: 6px; }
+    .signup-role-card .role-name { font-size: 12px; font-weight: 700; }
+    .signup-role-card .role-desc { font-size: 10px; color: var(--soft-gray); margin-top: 2px; }
+
+    /* ─────────────────────────────
+       PARTNER REQUEST PAGE
+    ───────────────────────────── */
+    #page-partner {
+      background: var(--cream);
+    }
+    .partner-wrap {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+    }
+    .partner-type-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .partner-type-card {
+      border: 1.5px solid var(--light-border);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all .2s;
+      background: #fff;
+    }
+    .partner-type-card:hover { border-color: var(--naxshin-gold); }
+    .partner-type-card.selected { border-color: var(--charcoal); background: var(--warm-white); }
+
+    /* ─────────────────────────────
+       APP LAYOUT (Logged in views)
+    ───────────────────────────── */
+    .app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+    .app-navbar {
+      background: #fff;
+      border-bottom: 1px solid var(--light-border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(0,0,0,.05);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--charcoal);
+    }
+    .nav-logo span { color: var(--naxshin-gold); }
+    .nav-tabs-custom { display: flex; gap: 4px; margin-left: auto; }
+    .nav-tab-btn {
+      padding: 7px 14px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--soft-gray);
+      cursor: pointer;
+      transition: all .2s;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-tab-btn:hover { background: var(--cream); color: var(--charcoal); }
+    .nav-tab-btn.active { background: var(--charcoal); color: #fff; }
+    .nav-tab-btn.active-customer { background: var(--customer-color); color: #fff; }
+    .nav-tab-btn.active-designer { background: var(--designer-color); color: #fff; }
+    .nav-tab-btn.active-printing { background: var(--printing-color); color: #fff; }
+    .nav-tab-btn.active-super { background: var(--super-color); color: #fff; }
+    .nav-shop-btn {
+      padding: 7px 14px;
+      border-radius: 12px;
+      border: 1.5px solid var(--light-border);
+      background: transparent;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--charcoal);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .2s;
+    }
+    .nav-shop-btn:hover { background: var(--cream); }
+    .app-content { flex: 1; padding: 28px 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .nav-avatar {
+      width: 38px; height: 38px; border-radius: 50%; background: var(--caramel); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; cursor: pointer; flex-shrink: 0;
+    }
+    .nav-cart-wrap { position: relative; }
+    .badge-cart {
+      position: absolute; top: -4px; right: -4px;
+      width: 16px; height: 16px; background: var(--naxshin-gold);
+      border-radius: 50%; color: #fff; font-size: 9px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─────────────────────────────
+       STAT CARDS
+    ───────────────────────────── */
+    .stat-card { background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,.05); transition: transform .2s; }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-icon-wrap { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 18px; }
+    .stat-value { font-size: 28px; font-weight: 900; font-family: 'Cormorant Garamond', serif; line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--soft-gray); font-weight: 500; margin-top: 4px; }
+    .stat-sub { font-size: 10px; color: var(--soft-gray); margin-top: 2px; }
+
+    /* ─────────────────────────────
+       PRODUCT CARDS (Shop)
+    ───────────────────────────── */
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .product-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.06); cursor: pointer; transition: all .25s; }
+    .product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.1); }
+    .product-img { position: relative; aspect-ratio: 3/3.5; overflow: hidden; }
+    .product-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .product-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 48px; }
+    .wishlist-btn { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; background: rgba(255,255,255,.92); border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: transform .2s; }
+    .wishlist-btn:hover { transform: scale(1.15); }
+    .product-badges { position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 4px; }
+    .badge-new { background: var(--naxshin-gold); color: #fff; font-size: 8px; font-weight: 800; padding: 3px 8px; border-radius: 20px; letter-spacing: .5px; }
+    .badge-trend { background: var(--naxshin-red); color: #fff; font-size: 8px; font-weight: 800; padding: 3px 8px; border-radius: 20px; }
+    .badge-3d { position: absolute; bottom: 10px; left: 10px; background: rgba(26,26,26,.8); color: #fff; font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; gap: 4px; }
+    .product-img-grad { position: absolute; bottom: 0; left: 0; right: 0; height: 60px; background: linear-gradient(to top, rgba(0,0,0,.15), transparent); pointer-events: none; }
+    .product-info { padding: 12px; }
+    .product-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .product-brand { font-size: 10px; color: var(--soft-gray); }
+    .product-price { font-size: 15px; font-weight: 800; font-family: 'Cormorant Garamond', serif; }
+    .add-btn { width: 28px; height: 28px; background: var(--charcoal); border: none; border-radius: 8px; color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity .2s; }
+    .add-btn:hover { opacity: .8; }
+
+    /* Category chips */
+    .chip-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+    .chip-bar::-webkit-scrollbar { display: none; }
+    .chip { padding: 7px 16px; border-radius: 30px; border: 1.5px solid var(--light-border); background: var(--warm-white); font-size: 12px; font-weight: 600; color: var(--soft-gray); cursor: pointer; white-space: nowrap; transition: all .2s; }
+    .chip.active { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+    .chip:hover:not(.active) { border-color: var(--charcoal); color: var(--charcoal); }
+
+    /* Search bar */
+    .search-bar { display: flex; align-items: center; gap: 12px; background: var(--warm-white); border: 1.5px solid var(--light-border); border-radius: 16px; padding: 10px 14px; }
+    .search-bar input { border: none; background: transparent; flex: 1; font-size: 14px; color: var(--charcoal); font-family: 'DM Sans', sans-serif; outline: none; }
+    .search-bar input::placeholder { color: var(--soft-gray); }
+    .filter-btn { width: 34px; height: 34px; background: var(--charcoal); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; flex-shrink: 0; }
+
+    /* Ad scroll (shop) */
+    .ad-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: none; }
+    .ad-scroll::-webkit-scrollbar { display: none; }
+    .ad-card { width: 200px; min-width: 200px; height: 105px; border-radius: 18px; position: relative; overflow: hidden; cursor: pointer; flex-shrink: 0; }
+    .ad-card-inner { position: absolute; inset: 0; padding: 14px; }
+    .ad-bubble { position: absolute; top: -20px; right: -20px; width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,.07); }
+    .ad-tag { font-size: 8px; color: rgba(255,255,255,.6); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .ad-title { font-size: 14px; color: #fff; font-weight: 800; font-family: 'Cormorant Garamond', serif; line-height: 1.3; margin-top: 2px; }
+    .ad-cta { position: absolute; bottom: 12px; right: 12px; background: rgba(255,255,255,.2); color: #fff; font-size: 9px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+    .ad-emoji { position: absolute; top: 14px; right: 14px; font-size: 28px; }
+    .sponsored-label { font-size: 10px; color: var(--soft-gray); font-weight: 700; letter-spacing: 1.2px; }
+
+    /* Section title */
+    .section-title { font-size: 24px; font-weight: 800; font-family: 'Cormorant Garamond', serif; }
+
+    /* Cart sidebar */
+    .cart-sidebar { position: fixed; right: 0; top: 0; bottom: 0; width: 400px; max-width: 100vw; background: #fff; z-index: 200; transform: translateX(110%); transition: transform .3s ease; box-shadow: -8px 0 32px rgba(0,0,0,.1); display: flex; flex-direction: column; }
+    .cart-sidebar.open { transform: translateX(0); }
+    .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 199; display: none; }
+    .cart-overlay.open { display: block; }
+    .cart-header { padding: 20px 20px 16px; border-bottom: 1px solid var(--light-border); display: flex; align-items: center; gap: 12px; }
+    .cart-body { flex: 1; overflow-y: auto; padding: 16px; }
+    .cart-footer { padding: 16px; border-top: 1px solid var(--light-border); background: #fff; }
+    .cart-item { display: flex; gap: 12px; background: var(--cream); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
+    .cart-item-img { width: 68px; height: 68px; border-radius: 10px; object-fit: cover; background: var(--warm-white); flex-shrink: 0; overflow: hidden; }
+    .cart-empty { text-align: center; padding: 60px 20px; }
+    .qty-btn { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--light-border); background: #fff; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+
+    /* Profile */
+    .profile-avatar { width: 88px; height: 88px; border-radius: 50%; background: var(--caramel); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 700; margin: 0 auto 12px; }
+    .role-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+    .order-chip { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+    .card-naxshin { background: #fff; border-radius: 18px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+    .list-item-naxshin { background: #fff; border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all .2s; }
+    .list-item-naxshin:hover { background: var(--cream); }
+
+    /* Misc buttons */
+    .btn-naxshin-dark { background: var(--charcoal); color: #fff; border: none; border-radius: 14px; padding: 14px 24px; font-size: 14px; font-weight: 700; font-family: 'DM Sans', sans-serif; width: 100%; cursor: pointer; transition: opacity .2s; }
+    .btn-naxshin-dark:hover { opacity: .85; }
+    .btn-outline-naxshin { background: #fff; border: 1.5px solid var(--light-border); border-radius: 14px; padding: 12px 18px; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .2s; color: var(--charcoal); display: flex; align-items: center; gap: 8px; justify-content: center; }
+    .btn-outline-naxshin:hover { border-color: var(--charcoal); }
+    .logout-btn { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #fff; border-radius: 14px; border: none; cursor: pointer; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--soft-gray); transition: all .2s; width: 100%; }
+    .logout-btn:hover { background: var(--cream); color: var(--charcoal); }
+    .section-gap { height: 24px; }
+    .fw-800 { font-weight: 800; }
+    .fw-900 { font-weight: 900; }
+    .text-soft { color: var(--soft-gray); }
+    .text-caramel { color: var(--caramel); }
+    .bg-cream { background: var(--cream); }
+    .bg-success-soft { background: rgba(39,174,96,.12); color: var(--success-green); }
+    .bg-caramel-soft { background: rgba(184,115,51,.12); color: var(--caramel); }
+    .bg-error-soft { background: rgba(192,57,43,.12); color: var(--error-red); }
+    .bg-warn-soft { background: rgba(224,160,48,.12); color: #E0A030; }
+
+    /* Order tiles */
+    .order-tile { background: #fff; border-radius: 18px; padding: 16px; box-shadow: 0 4px 10px rgba(0,0,0,.04); margin-bottom: 10px; }
+    .order-row { display: flex; align-items: center; gap: 12px; }
+
+    /* Chart */
+    .chart-card { background: #fff; border-radius: 20px; padding: 20px; box-shadow: 0 4px 16px rgba(0,0,0,.05); }
+
+    /* User / product admin tiles */
+    .user-tile { background: #fff; border-radius: 18px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.04); margin-bottom: 10px; }
+    .user-avatar-sm { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+    .product-row { background: #fff; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.04); margin-bottom: 10px; }
+    .product-thumb { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; background: var(--warm-white); overflow: hidden; flex-shrink: 0; }
+
+    /* Design tiles */
+    .design-tile { background: #fff; border-radius: 18px; padding: 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 10px rgba(0,0,0,.04); margin-bottom: 10px; }
+    .design-icon { width: 52px; height: 52px; border-radius: 12px; background: rgba(142,107,173,.1); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .upload-zone { border: 2px dashed var(--light-border); border-radius: 20px; padding: 48px 24px; text-align: center; background: var(--warm-white); cursor: pointer; transition: all .2s; }
+    .upload-zone:hover { border-color: var(--naxshin-gold); background: #EDE6DC; }
+    .tag-chip { padding: 7px 14px; border-radius: 30px; border: 1.5px solid var(--light-border); background: var(--warm-white); font-size: 12px; font-weight: 600; color: var(--soft-gray); cursor: pointer; transition: all .2s; display: inline-block; margin: 4px; }
+    .tag-chip.active { background: var(--designer-color); border-color: var(--designer-color); color: #fff; }
+
+    /* Modal */
+    .modal-backdrop-custom { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 999; display: none; align-items: flex-end; justify-content: center; }
+    .modal-backdrop-custom.open { display: flex; }
+    .modal-sheet { background: var(--cream); border-radius: 24px 24px 0 0; max-height: 92vh; overflow-y: auto; width: 100%; max-width: 640px; padding: 0 0 32px; animation: sheetUp .3s ease; }
+    @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-img-wrap { position: relative; height: 360px; overflow: hidden; background: var(--warm-white); }
+    .modal-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-top-btn { width: 40px; height: 40px; background: rgba(255,255,255,.9); border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .modal-top-btns { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; gap: 8px; }
+    .size-btn { width: 52px; height: 44px; border-radius: 12px; border: 1.5px solid var(--light-border); background: var(--warm-white); font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .size-btn.active { background: var(--charcoal); border-color: var(--charcoal); color: #fff; }
+    .color-dot { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; transition: all .2s; display: flex; align-items: center; justify-content: center; }
+    .color-dot.active { border-color: var(--charcoal); }
+    .modal-footer { background: #fff; border-top: 1px solid var(--light-border); padding: 16px; display: flex; gap: 12px; position: sticky; bottom: 0; }
+
+    /* Toasts */
+    .toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+    .toast-naxshin { background: var(--charcoal); color: #fff; padding: 12px 24px; border-radius: 14px; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.2); animation: toastIn .3s ease; min-width: 200px; text-align: center; }
+    .toast-naxshin.success { background: var(--success-green); }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Loading */
+    .auth-error { background: rgba(192,57,43,.1); color: var(--error-red); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; margin-bottom: 16px; display: none; }
+    .auth-error.show { display: block; }
+
+    /* Animations */
+    .fade-in { animation: fadeIn .5s ease forwards; }
+    .slide-up { animation: slideUp .5s ease forwards; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Img dots */
+    .img-dots { display: flex; gap: 6px; justify-content: center; padding: 12px 0; }
+    .img-dot { width: 6px; height: 6px; border-radius: 3px; background: var(--light-border); cursor: pointer; transition: all .2s; border: none; }
+    .img-dot.active { width: 20px; background: var(--charcoal); }
+
+    /* View toggle */
+    .view-toggle { display: flex; background: #fff; border-radius: 14px; border: 1.5px solid var(--light-border); overflow: hidden; margin: 0 16px 16px; }
+    .view-toggle-btn { flex: 1; padding: 8px; font-size: 12px; font-weight: 600; border: none; background: transparent; cursor: pointer; color: var(--soft-gray); transition: all .2s; }
+    .view-toggle-btn.active { background: var(--charcoal); color: #fff; border-radius: 12px; margin: 3px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .app-navbar { padding: 0 16px; height: 56px; }
+      .nav-tabs-custom { gap: 2px; }
+      .nav-tab-btn { padding: 6px 10px; font-size: 12px; }
+      .app-content { padding: 20px 16px; }
+      .cart-sidebar { width: 100vw; }
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .landing-nav { padding: 16px 20px; }
+      .hero-section { padding: 40px 20px 30px; }
+      .featured-strip { padding: 16px 20px; }
+      .landing-section { padding: 24px 20px 0; }
+      .ads-section { padding: 24px 20px; }
+      .partner-section { margin: 0 20px 40px; padding: 28px 24px; }
+      .trending-card { min-width: calc(85% - 8px); }
+    }
+    @media (max-width: 480px) {
+      .nav-tab-btn span { display: none; }
+      .nav-tab-btn { padding: 8px 10px; }
+      .signup-role-grid { grid-template-columns: 1fr; }
+      .partner-type-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Back button */
+    .back-btn { background: none; border: none; cursor: pointer; color: var(--charcoal); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; padding: 0; font-family: 'DM Sans', sans-serif; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+   PAGE: LANDING
+══════════════════════════════════════════ -->
+<div id="page-landing" class="page active">
+  <nav class="landing-nav">
+    <div class="landing-logo">
+      <div>
+        <div class="landing-logo-text">NAXSHIN</div>
+        <div class="landing-logo-sub">Print &amp; Design</div>
+      </div>
+    </div>
+    <div class="landing-nav-actions">
+      <button class="btn-signup-outline" onclick="showPage('signup')">Sign Up</button>
+      <button class="btn-login" onclick="showPage('login')"><i class="bi bi-person"></i> Login</button>
+    </div>
+  </nav>
+
+  <div class="hero-section fade-in">
+    <div class="hero-badge">✦ Kurdish Heritage Meets Modern Design</div>
+    <h1 class="hero-title">Fashion Crafted<br>for <span>Every Story</span></h1>
+    <p class="hero-subtitle">Discover unique print-on-demand fashion from local designers. Wear your culture, express your identity.</p>
+    <div class="hero-actions">
+      <button class="btn-hero-primary" onclick="showPage('login')"><i class="bi bi-bag"></i> Shop Now</button>
+      <button class="btn-hero-secondary" onclick="showPage('partner')">Become a Partner →</button>
+    </div>
+  </div>
+
+  <!-- Featured Products Strip -->
+  <div class="featured-strip" id="landing-featured-strip"></div>
+
+  <!-- Trending Section with Slider -->
+  <div class="landing-section">
+    <div class="section-header">
+      <h2 class="section-title-lg cormorant">🔥 Trending Now</h2>
+      <div class="slider-controls">
+        <div class="slider-dots" id="trend-dots"></div>
+        <button class="slider-arrow" onclick="trendSlide(-1)"><i class="bi bi-chevron-left"></i></button>
+        <button class="slider-arrow" onclick="trendSlide(1)"><i class="bi bi-chevron-right"></i></button>
+      </div>
+    </div>
+    <div class="trending-slider-wrap">
+      <div class="trending-slider" id="trending-slider"></div>
+    </div>
+  </div>
+
+  <!-- Ads / Sponsors Section -->
+  <div class="ads-section">
+    <p class="ad-sponsored">✦ SPONSORED — ADVERTISING PARTNERS</p>
+    <div class="ads-grid" id="landing-ads-grid"></div>
+  </div>
+
+  <!-- Partner CTA -->
+  <div class="partner-section">
+    <div>
+      <h2>Join Naxshin as a Partner</h2>
+      <p>Advertise your brand, submit designs, or manage printing — we have a role for you.</p>
+    </div>
+    <button class="btn-partner" onclick="showPage('partner')">Apply Now →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+   PAGE: LOGIN
+══════════════════════════════════════════ -->
+<div id="page-login" class="page">
+  <div class="auth-wrap fade-in">
+    <button class="auth-back-btn" onclick="showPage('landing')"><i class="bi bi-arrow-left"></i> Back to Home</button>
+    <div class="auth-logo">
+      <div class="auth-logo-text">NAXSHIN</div>
+      <div class="auth-logo-sub">Print &amp; Design</div>
+    </div>
+    <p class="auth-subtitle">Welcome back. Sign in to your account.</p>
+    <div class="auth-error" id="login-error"></div>
+    <div class="input-wrap mb-3">
+      <i class="bi bi-envelope input-icon"></i>
+      <input type="email" id="login-email" class="form-control-naxshin" placeholder="Email address">
+    </div>
+    <div class="input-wrap mb-2">
+      <i class="bi bi-lock input-icon"></i>
+      <input type="password" id="login-pass" class="form-control-naxshin" placeholder="Password">
+      <button class="input-toggle" onclick="toggleLoginPass()"><i class="bi bi-eye-slash" id="login-pass-icon"></i></button>
+    </div>
+    <div class="text-end mb-4">
+      <a href="#" class="text-caramel" style="font-size:13px;font-weight:600;text-decoration:none">Forgot password?</a>
+    </div>
+    <button class="btn-auth-primary mb-4" onclick="doLogin()" id="login-btn">Continue</button>
+    <div class="divider-or mb-4">or</div>
+    <div class="row g-3 mb-4">
+      <div class="col-6"><button class="btn-social" onclick="doGoogleLogin()"><i class="bi bi-google" style="color:#4285F4"></i> Google</button></div>
+      <div class="col-6"><button class="btn-social"><i class="bi bi-apple"></i> Apple</button></div>
+    </div>
+    <p class="text-center" style="font-size:13px;color:var(--soft-gray)">Don't have an account? <a href="#" class="text-caramel fw-bold" style="text-decoration:none" onclick="showPage('signup')">Sign up</a></p>
+
+    <!-- Demo quick login -->
+    <div style="margin-top:24px;padding:16px;background:var(--warm-white);border-radius:14px;font-size:12px;">
+      <div style="font-weight:700;margin-bottom:10px;color:var(--soft-gray)">DEMO — Quick Login</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button onclick="demoLogin('customer')" style="padding:8px;border:1.5px solid var(--light-border);border-radius:10px;background:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">🛍️ Customer</button>
+        <button onclick="demoLogin('designer')" style="padding:8px;border:1.5px solid var(--light-border);border-radius:10px;background:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">🎨 Designer</button>
+        <button onclick="demoLogin('printing')" style="padding:8px;border:1.5px solid var(--light-border);border-radius:10px;background:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">🖨️ Printing</button>
+        <button onclick="demoLogin('superadmin')" style="padding:8px;border:1.5px solid var(--light-border);border-radius:10px;background:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">👑 Admin</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+   PAGE: SIGNUP
+══════════════════════════════════════════ -->
+<div id="page-signup" class="page">
+  <div class="auth-wrap fade-in">
+    <button class="auth-back-btn" onclick="showPage('landing')"><i class="bi bi-arrow-left"></i> Back to Home</button>
+    <div class="auth-logo">
+      <div class="auth-logo-text">NAXSHIN</div>
+      <div class="auth-logo-sub">Print &amp; Design</div>
+    </div>
+    <p class="auth-subtitle">Create your account. Choose your role below.</p>
+    <div class="auth-error" id="signup-error"></div>
+
+    <div class="signup-role-grid mb-4" id="signup-role-grid">
+      <div class="signup-role-card selected" data-role="customer" onclick="selectSignupRole('customer')">
+        <span class="role-emoji">🛍️</span>
+        <div class="role-name">Customer</div>
+        <div class="role-desc">Browse & order</div>
+      </div>
+      <div class="signup-role-card" data-role="designer" onclick="selectSignupRole('designer')">
+        <span class="role-emoji">🎨</span>
+        <div class="role-name">Designer</div>
+        <div class="role-desc">Submit designs</div>
+      </div>
+      <div class="signup-role-card" data-role="printing" onclick="selectSignupRole('printing')">
+        <span class="role-emoji">🖨️</span>
+        <div class="role-name">Printer</div>
+        <div class="role-desc">Fulfill orders</div>
+      </div>
+      <div class="signup-role-card" data-role="advertiser" onclick="selectSignupRole('advertiser')">
+        <span class="role-emoji">📢</span>
+        <div class="role-name">Advertiser</div>
+        <div class="role-desc">Run campaigns</div>
+      </div>
+    </div>
+
+    <div id="signup-pending-note" style="display:none;background:rgba(184,115,51,.1);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--caramel);font-weight:600;margin-bottom:16px;">
+      ⏳ Designer, Printer, and Advertiser accounts require admin approval. You'll be notified by email.
+    </div>
+
+    <div class="input-wrap mb-3">
+      <i class="bi bi-person input-icon"></i>
+      <input type="text" id="signup-name" class="form-control-naxshin" placeholder="Full name">
+    </div>
+    <div class="input-wrap mb-3">
+      <i class="bi bi-envelope input-icon"></i>
+      <input type="email" id="signup-email" class="form-control-naxshin" placeholder="Email address">
+    </div>
+    <div class="input-wrap mb-4">
+      <i class="bi bi-lock input-icon"></i>
+      <input type="password" id="signup-pass" class="form-control-naxshin" placeholder="Password (min 6 characters)">
+    </div>
+    <button class="btn-auth-primary mb-3" onclick="doSignup()" id="signup-btn">Create Account</button>
+    <p class="text-center" style="font-size:13px;color:var(--soft-gray)">Already have an account? <a href="#" class="text-caramel fw-bold" style="text-decoration:none" onclick="showPage('login')">Sign in</a></p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+   PAGE: PARTNER REQUEST
+══════════════════════════════════════════ -->
+<div id="page-partner" class="page">
+  <div class="partner-wrap fade-in">
+    <button class="auth-back-btn" onclick="showPage('landing')"><i class="bi bi-arrow-left"></i> Back to Home</button>
+    <div style="margin-bottom:28px;">
+      <div class="auth-logo-text" style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;">Partner with<br>Naxshin</div>
+      <p style="color:var(--soft-gray);font-size:14px;margin-top:8px;">Choose how you'd like to collaborate with us.</p>
+    </div>
+
+    <p style="font-size:12px;font-weight:700;color:var(--soft-gray);letter-spacing:1px;margin-bottom:10px;">SELECT PARTNERSHIP TYPE</p>
+    <div class="partner-type-grid mb-4" id="partner-type-grid">
+      <div class="partner-type-card selected" data-type="designer" onclick="selectPartnerType('designer')">
+        <div style="font-size:28px;margin-bottom:8px;">🎨</div>
+        <div style="font-weight:700;font-size:14px;">Designer</div>
+        <div style="font-size:12px;color:var(--soft-gray);margin-top:4px;">Submit and sell your designs on our platform</div>
+      </div>
+      <div class="partner-type-card" data-type="printing" onclick="selectPartnerType('printing')">
+        <div style="font-size:28px;margin-bottom:8px;">🖨️</div>
+        <div style="font-weight:700;font-size:14px;">Print Partner</div>
+        <div style="font-size:12px;color:var(--soft-gray);margin-top:4px;">Manufacture and fulfill orders for us</div>
+      </div>
+      <div class="partner-type-card" data-type="advertiser" onclick="selectPartnerType('advertiser')">
+        <div style="font-size:28px;margin-bottom:8px;">📢</div>
+        <div style="font-weight:700;font-size:14px;">Advertiser</div>
+        <div style="font-size:12px;color:var(--soft-gray);margin-top:4px;">Display your brand on our platform banners</div>
+      </div>
+      <div class="partner-type-card" data-type="brand" onclick="selectPartnerType('brand')">
+        <div style="font-size:28px;margin-bottom:8px;">🏷️</div>
+        <div style="font-weight:700;font-size:14px;">Brand Collab</div>
+        <div style="font-size:12px;color:var(--soft-gray);margin-top:4px;">Co-create an exclusive collection with us</div>
+      </div>
+    </div>
+
+    <div class="input-wrap mb-3">
+      <i class="bi bi-person input-icon"></i>
+      <input type="text" id="partner-name" class="form-control-naxshin" placeholder="Your full name / company name">
+    </div>
+    <div class="input-wrap mb-3">
+      <i class="bi bi-envelope input-icon"></i>
+      <input type="email" id="partner-email" class="form-control-naxshin" placeholder="Email address">
+    </div>
+    <div class="input-wrap mb-3">
+      <i class="bi bi-telephone input-icon"></i>
+      <input type="tel" id="partner-phone" class="form-control-naxshin" placeholder="Phone number (optional)">
+    </div>
+    <div class="mb-4" style="position:relative;">
+      <textarea id="partner-message" style="background:var(--warm-white);border:1.5px solid var(--light-border);border-radius:14px;padding:14px 16px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--charcoal);width:100%;resize:vertical;min-height:100px;outline:none;" placeholder="Tell us about yourself and your goals..."></textarea>
+    </div>
+    <button class="btn-auth-primary" onclick="submitPartnerRequest()">Submit Request →</button>
+    <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--soft-gray);">We typically respond within 2-3 business days.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+   PAGE: CUSTOMER
+══════════════════════════════════════════ -->
+<div id="page-customer" class="page">
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <div class="nav-logo">NAXSHIN <span style="font-size:14px">✦</span></div>
+      <div class="nav-tabs-custom">
+        <button class="nav-tab-btn active-customer active" id="ctab-shop" onclick="customerTab('shop')"><i class="bi bi-bag"></i> <span>Shop</span></button>
+        <button class="nav-tab-btn" id="ctab-wishlist" onclick="customerTab('wishlist')"><i class="bi bi-heart"></i> <span>Saved</span></button>
+        <button class="nav-tab-btn nav-cart-wrap" id="ctab-cart" onclick="openCart()">
+          <i class="bi bi-cart"></i> <span>Cart</span>
+          <span class="badge-cart" id="cart-badge" style="display:none">0</span>
+        </button>
+        <button class="nav-tab-btn" id="ctab-profile" onclick="customerTab('profile')"><i class="bi bi-person"></i> <span>Profile</span></button>
+      </div>
+      <div class="nav-avatar" id="customer-avatar">A</div>
+    </nav>
+    <div class="app-content">
+      <div id="ctab-shop-content">
+        <div class="search-bar mb-4">
+          <i class="bi bi-search" style="color:var(--soft-gray)"></i>
+          <input type="text" placeholder="Search for styles, brands…" id="shop-search" oninput="filterProducts()">
+          <button class="filter-btn"><i class="bi bi-sliders" style="color:#fff;font-size:14px"></i></button>
+        </div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="sponsored-label">✦ SPONSORED</span>
+        </div>
+        <div class="ad-scroll mb-4" id="ad-scroll"></div>
+        <div class="chip-bar mb-4" id="category-bar"></div>
+
+        <!-- Trending Section in Shop -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;">🔥 Trending</h2>
+          <div style="display:flex;gap:8px;">
+            <button class="slider-arrow" style="width:30px;height:30px;font-size:12px;" onclick="shopTrendSlide(-1)"><i class="bi bi-chevron-left"></i></button>
+            <button class="slider-arrow" style="width:30px;height:30px;font-size:12px;" onclick="shopTrendSlide(1)"><i class="bi bi-chevron-right"></i></button>
+          </div>
+        </div>
+        <div style="overflow:hidden;margin-bottom:28px;">
+          <div class="trending-slider" id="shop-trending-slider" style="gap:12px;"></div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h2 class="section-title">New Arrivals</h2>
+          <span style="font-size:13px;color:var(--caramel);font-weight:600;cursor:pointer">See all →</span>
+        </div>
+        <div class="product-grid" id="product-grid"></div>
+      </div>
+      <div id="ctab-wishlist-content" style="display:none">
+        <h2 class="section-title mb-4">Saved</h2>
+        <div id="wishlist-content"></div>
+      </div>
+      <div id="ctab-profile-content" style="display:none">
+        <h2 class="section-title mb-4">Profile</h2>
+        <div id="profile-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+   PAGE: DESIGNER
+══════════════════════════════════════════ -->
+<div id="page-designer" class="page">
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <div class="nav-logo">NAXSHIN <span style="color:var(--designer-color);font-size:14px">✦</span></div>
+      <div class="nav-tabs-custom">
+        <button class="nav-tab-btn active-designer active" id="dtab-dashboard" onclick="designerTab('dashboard')"><i class="bi bi-grid"></i> <span>Dashboard</span></button>
+        <button class="nav-tab-btn" id="dtab-designs" onclick="designerTab('designs')"><i class="bi bi-palette"></i> <span>Designs</span></button>
+        <button class="nav-tab-btn" id="dtab-upload" onclick="designerTab('upload')"><i class="bi bi-plus-circle"></i> <span>Upload</span></button>
+        <button class="nav-tab-btn" id="dtab-dprofile" onclick="designerTab('dprofile')"><i class="bi bi-person"></i> <span>Profile</span></button>
+      </div>
+      <button class="nav-shop-btn" onclick="viewShopAs('designer')"><i class="bi bi-shop"></i> <span>View Shop</span></button>
+      <div class="nav-avatar" style="background:var(--designer-color)" id="designer-avatar">Y</div>
+    </nav>
+    <div class="app-content">
+      <div id="dtab-dashboard-content"></div>
+      <div id="dtab-designs-content" style="display:none"></div>
+      <div id="dtab-upload-content" style="display:none"></div>
+      <div id="dtab-dprofile-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+   PAGE: PRINTING
+══════════════════════════════════════════ -->
+<div id="page-printing" class="page">
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <div class="nav-logo">NAXSHIN <span style="color:var(--printing-color);font-size:14px">✦</span></div>
+      <div class="nav-tabs-custom">
+        <button class="nav-tab-btn active-printing active" id="ptab-dashboard" onclick="printingTab('dashboard')"><i class="bi bi-grid"></i> <span>Dashboard</span></button>
+        <button class="nav-tab-btn" id="ptab-orders" onclick="printingTab('orders')"><i class="bi bi-list-ul"></i> <span>Orders</span></button>
+        <button class="nav-tab-btn" id="ptab-queue" onclick="printingTab('queue')"><i class="bi bi-printer"></i> <span>Queue</span></button>
+        <button class="nav-tab-btn" id="ptab-pprofile" onclick="printingTab('pprofile')"><i class="bi bi-person"></i> <span>Profile</span></button>
+      </div>
+      <button class="nav-shop-btn" onclick="viewShopAs('printing')"><i class="bi bi-shop"></i> <span>View Shop</span></button>
+      <div class="nav-avatar" style="background:var(--printing-color)" id="printing-avatar">K</div>
+    </nav>
+    <div class="app-content">
+      <div id="ptab-dashboard-content"></div>
+      <div id="ptab-orders-content" style="display:none"></div>
+      <div id="ptab-queue-content" style="display:none"></div>
+      <div id="ptab-pprofile-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+   PAGE: SUPER ADMIN
+══════════════════════════════════════════ -->
+<div id="page-superadmin" class="page">
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <div class="nav-logo">NAXSHIN <span style="color:var(--super-color);font-size:14px">👑</span></div>
+      <div class="nav-tabs-custom">
+        <button class="nav-tab-btn active-super active" id="stab-overview" onclick="superTab('overview')"><i class="bi bi-bar-chart"></i> <span>Overview</span></button>
+        <button class="nav-tab-btn" id="stab-users" onclick="superTab('users')"><i class="bi bi-people"></i> <span>Users</span></button>
+        <button class="nav-tab-btn" id="stab-products" onclick="superTab('products')"><i class="bi bi-box"></i> <span>Products</span></button>
+        <button class="nav-tab-btn" id="stab-requests" onclick="superTab('requests')"><i class="bi bi-inbox"></i> <span>Requests</span></button>
+        <button class="nav-tab-btn" id="stab-analytics" onclick="superTab('analytics')"><i class="bi bi-graph-up"></i> <span>Analytics</span></button>
+      </div>
+      <button class="nav-shop-btn" onclick="viewShopAs('superadmin')"><i class="bi bi-shop"></i> <span>View Shop</span></button>
+      <div class="nav-avatar" style="background:var(--super-color)" id="super-avatar">N</div>
+    </nav>
+    <div class="app-content">
+      <div id="stab-overview-content"></div>
+      <div id="stab-users-content" style="display:none"></div>
+      <div id="stab-products-content" style="display:none"></div>
+      <div id="stab-requests-content" style="display:none"></div>
+      <div id="stab-analytics-content" style="display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Shop Preview (for admins) -->
+<div id="page-shop-preview" class="page">
+  <div class="app-layout">
+    <nav class="app-navbar">
+      <button class="back-btn" onclick="goBackFromShopPreview()"><i class="bi bi-arrow-left"></i> Back to Dashboard</button>
+      <div class="nav-logo" style="margin-left:16px;">NAXSHIN <span style="font-size:14px">✦</span></div>
+      <div class="nav-tabs-custom" style="margin-left:auto;">
+        <button class="nav-tab-btn active" style="background:var(--charcoal);color:#fff;"><i class="bi bi-bag"></i> <span>Shop View</span></button>
+      </div>
+    </nav>
+    <div class="app-content">
+      <div class="search-bar mb-4">
+        <i class="bi bi-search" style="color:var(--soft-gray)"></i>
+        <input type="text" placeholder="Search for styles, brands…" id="preview-search" oninput="filterPreviewProducts()">
+        <button class="filter-btn"><i class="bi bi-sliders" style="color:#fff;font-size:14px"></i></button>
+      </div>
+      <div class="ad-scroll mb-4" id="preview-ad-scroll"></div>
+      <div class="chip-bar mb-4" id="preview-category-bar"></div>
+      <h2 class="section-title mb-3">All Products</h2>
+      <div class="product-grid" id="preview-product-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ Cart Sidebar ════ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-sidebar" id="cart-sidebar">
+  <div class="cart-header">
+    <h3 style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:20px;">Cart</h3>
+    <span class="ms-2 text-soft" id="cart-count-label">(0)</span>
+    <button class="ms-auto btn-outline-naxshin" style="padding:6px 14px;font-size:12px" onclick="clearCart()">Clear</button>
+    <button class="modal-top-btn ms-2" onclick="closeCart()"><i class="bi bi-x-lg" style="font-size:14px"></i></button>
+  </div>
+  <div class="cart-body" id="cart-body"></div>
+  <div class="cart-footer" id="cart-footer"></div>
+</div>
+
+<!-- ════ Product Modal ════ -->
+<div class="modal-backdrop-custom" id="product-modal">
+  <div class="modal-sheet" id="modal-sheet"></div>
+</div>
+
+<!-- ════ Toast ════ -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+const COLORS = [
+  { name: 'Charcoal', hex: '#2D2D2D' },
+  { name: 'Caramel', hex: '#B87333' },
+  { name: 'Ivory', hex: '#F5F0E8' },
+  { name: 'Navy', hex: '#1E3A5F' },
+  { name: 'Sage', hex: '#8FAF8F' },
+  { name: 'Rose', hex: '#D4829A' },
+];
+const PRODUCTS = [
+  { id:'p1', name:'Linen Drop Tee', brand:'NAXSHIN BASICS', desc:'Ultra-soft linen blend tee with a relaxed drop shoulder. Breathable, lightweight and timeless.', price:42, cat:'T-Shirt', images:['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800'], colors:[0,1,2], sizes:['XS','S','M','L','XL','XXL'], has3d:true, isNew:true, isTrending:false, rating:4.8, reviews:124, gradient:['#E8D5C4','#B87333'], icon:'👕' },
+  { id:'p2', name:'Cloud Hoodie', brand:'NAXSHIN COZY', desc:'Impossibly soft fleece hoodie with kangaroo pocket. Perfect layering piece for any season.', price:89, cat:'Hoodie', images:['https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800'], colors:[3,0,4], sizes:['S','M','L','XL','XXL'], has3d:true, isNew:false, isTrending:true, rating:4.9, reviews:287, gradient:['#C5D4E8','#6B8FAD'], icon:'🧥' },
+  { id:'p3', name:'Wide Leg Trousers', brand:'NAXSHIN FIT', desc:'Relaxed wide-leg silhouette in wrinkle-resistant crepe. Elevated comfort from office to evening.', price:67, cat:'Pants', images:['https://images.unsplash.com/photo-1594938298603-c8148c4b4fec?w=800'], colors:[1,5,2], sizes:['XS','S','M','L','XL'], has3d:true, isNew:false, isTrending:true, rating:4.6, reviews:89, gradient:['#D4E8D0','#5B9A6B'], icon:'👖' },
+  { id:'p4', name:'Oversized Coat', brand:'NAXSHIN LUXE', desc:'Statement oversized coat in premium wool blend. Structured shoulders, clean minimalist lines.', price:145, cat:'Coat', images:['https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=800'], colors:[0,2,3], sizes:['XS','S','M','L','XL'], has3d:true, isNew:false, isTrending:true, rating:4.7, reviews:156, gradient:['#E8C5D0','#AD6B8E'], icon:'🧣' },
+  { id:'p5', name:'Slip Midi Dress', brand:'NAXSHIN LUXE', desc:'Elegant satin-finish midi dress with adjustable straps. Effortlessly transitions from day to night.', price:98, cat:'Dress', images:['https://images.unsplash.com/photo-1572804013427-4d7ca7268217?w=800'], colors:[5,2,1], sizes:['XS','S','M','L'], has3d:true, isNew:true, isTrending:false, rating:4.9, reviews:203, gradient:['#E8D0E8','#8E6BAD'], icon:'👗' },
+  { id:'p6', name:'Bucket Hat', brand:'NAXSHIN BASICS', desc:'Classic bucket hat in canvas. UV protective, packable, and styled for any look.', price:28, cat:'Accessories', images:['https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=800'], colors:[0,4,1], sizes:['S/M','L/XL'], has3d:false, isNew:false, isTrending:false, rating:4.4, reviews:67, gradient:['#E8E8C5','#9A9A5B'], icon:'🎩' },
+];
+const DEMO_USERS = [
+  { id:'u1', name:'Amira Hassan', email:'customer@naxshin.com', role:'customer', initial:'A' },
+  { id:'d1', name:'Yusuf Al-Rashid', email:'designer@naxshin.com', role:'designer', initial:'Y' },
+  { id:'p1u', name:'Khalid Mansour', email:'printing@naxshin.com', role:'printing', initial:'K' },
+  { id:'s1', name:'Nour Al-Din', email:'admin@naxshin.com', role:'superadmin', initial:'N' },
+];
+const DEMO_ORDERS = [
+  { id:'ORD-2024-001', items:1, total:42, status:'printing' },
+  { id:'ORD-2024-002', items:2, total:89, status:'pending' },
+  { id:'ORD-2024-003', items:1, total:145, status:'confirmed' },
+  { id:'ORD-2024-004', items:3, total:226, status:'delivered' },
+  { id:'ORD-2024-005', items:1, total:67, status:'shipping' },
+];
+const ADS = [
+  { tag:'Flash Sale', title:'Up to 60%\nOff Today', emoji:'🏷️', cta:'Shop →', grad:['#1a1a2e','#B87333'] },
+  { tag:'Brand Page', title:'EcoWear\nCollection', emoji:'🌿', cta:'Visit →', grad:['#2d4a22','#5B9A6B'] },
+  { tag:'Designer Drop', title:'Luxe Fall\nEdit 2025', emoji:'✨', cta:'Explore →', grad:['#2a1a3e','#8E6BAD'] },
+  { tag:'Trending Now', title:'Viral Fits\nThis Week', emoji:'🔥', cta:'See All →', grad:['#3e1a1a','#8B2020'] },
+];
+const STATUS_COLORS = { pending:'#E0A030', confirmed:'#6B8FAD', designing:'#8E6BAD', printing:'#B87333', shipping:'#5BA8D4', delivered:'#27AE60', cancelled:'#C0392B' };
+const ROLE_INFO = {
+  customer: { color:'var(--customer-color)', emoji:'🛍️', label:'Customer' },
+  designer: { color:'var(--designer-color)', emoji:'🎨', label:'Designer' },
+  printing: { color:'var(--printing-color)', emoji:'🖨️', label:'Print Admin' },
+  superadmin: { color:'var(--super-color)', emoji:'👑', label:'Super Admin' },
+};
+
+// Demo partner requests
+let PARTNER_REQUESTS = [
+  { id:'pr1', name:'Ari Design Studio', email:'ari@design.com', type:'designer', message:'We create Kurdish pattern prints.', status:'pending', date:'2024-12-01' },
+  { id:'pr2', name:'Kurdistan Print Co', email:'info@kprint.com', type:'printing', message:'Professional DTG printing, 500+ orders/month.', status:'pending', date:'2024-12-03' },
+  { id:'pr3', name:'Zara Kurdistan', email:'zk@brand.com', type:'advertiser', message:'Looking to advertise our new collection.', status:'approved', date:'2024-11-28' },
+];
+
+// ══ App State ══
+const state = {
+  role: null,
+  cart: [],
+  wishlist: [],
+  orders: [],
+  designs: [],
+  selectedCategory: null,
+  currentProduct: null,
+  selectedSize: '',
+  selectedColor: null,
+  quantity: 1,
+  imgIndex: 0,
+  previousPage: null,
+  currentUser: null,
+  signupRole: 'customer',
+  partnerType: 'designer',
+  trendIndex: 0,
+  shopTrendIndex: 0,
+};
+
+// ══ Page Navigation ══
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ══ Landing Page Init ══
+function initLanding() {
+  // Featured strip
+  const strip = document.getElementById('landing-featured-strip');
+  if (strip) {
+    strip.innerHTML = PRODUCTS.map(p => `
+      <div class="featured-card" onclick="showPage('login')">
+        <div class="featured-card-img">
+          <img src="${p.images[0]}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="featured-card-placeholder" style="display:none;background:linear-gradient(135deg,${p.gradient[0]},${p.gradient[1]})">${p.icon}</div>
+        </div>
+        <div class="featured-card-info">
+          <div class="featured-card-name">${p.name}</div>
+          <div class="featured-card-price">$${p.price}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  // Trending slider
+  const trending = PRODUCTS.filter(p => p.isTrending);
+  const slider = document.getElementById('trending-slider');
+  if (slider) {
+    slider.innerHTML = trending.map(p => `
+      <div class="trending-card">
+        <div class="trending-card-img">
+          <img src="${p.images[0]}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="trending-card-img-placeholder" style="display:none;background:linear-gradient(135deg,${p.gradient[0]},${p.gradient[1]})">${p.icon}</div>
+          <div class="trend-badge">🔥 TRENDING</div>
+        </div>
+        <div class="trending-card-info">
+          <div class="trending-card-name">${p.name}</div>
+          <div class="trending-card-brand">${p.brand}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div class="trending-card-price">$${p.price}</div>
+            <button class="trending-card-btn" onclick="showPage('login')">Shop Now</button>
+          </div>
+        </div>
+      </div>`).join('');
+
+    const dots = document.getElementById('trend-dots');
+    if (dots) {
+      dots.innerHTML = trending.map((_, i) => `<button class="slider-dot ${i===0?'active':''}" onclick="goTrendSlide(${i})"></button>`).join('');
+    }
+  }
+
+  // Ads grid
+  const adsGrid = document.getElementById('landing-ads-grid');
+  const adColors = [
+    { grad: ['#1a1a2e','#B87333'], dark: false, tag:'FLASH SALE', title:'Up to 60%\nOff Today', cta:'Shop Now →', emoji:'🏷️' },
+    { grad: ['#1E3D1E','#5B9A6B'], dark: false, tag:'ECO COLLECTION', title:'EcoWear\nby Naxshin', cta:'Explore →', emoji:'🌿' },
+    { grad: ['#f7f3ee','#ede8dc'], dark: true, tag:'DESIGNER DROP', title:'Luxe Fall\nEdit 2025', cta:'View Designs →', emoji:'✨' },
+    { grad: ['#2a1a3e','#8E6BAD'], dark: false, tag:'BRAND PARTNER', title:'Kurdistan\nHeritage', cta:'Discover →', emoji:'🎨' },
+  ];
+  if (adsGrid) {
+    adsGrid.innerHTML = adColors.map(ad => `
+      <div class="ad-banner" style="background:linear-gradient(135deg,${ad.grad[0]},${ad.grad[1]})">
+        <div class="ad-banner-emoji">${ad.emoji}</div>
+        <div class="ad-banner-label ${ad.dark?'dark':''}">✦ ${ad.tag}</div>
+        <div class="ad-banner-title ${ad.dark?'dark':''}">${ad.title.replace('\n','<br>')}</div>
+        <div class="ad-banner-cta ${ad.dark?'dark':''}">${ad.cta}</div>
+      </div>`).join('');
+  }
+}
+
+// Trending slider logic
+function trendSlide(dir) {
+  const trending = PRODUCTS.filter(p => p.isTrending);
+  state.trendIndex = Math.max(0, Math.min(trending.length - 1, state.trendIndex + dir));
+  updateTrendSlider();
+}
+function goTrendSlide(i) {
+  state.trendIndex = i;
+  updateTrendSlider();
+}
+function updateTrendSlider() {
+  const slider = document.getElementById('trending-slider');
+  if (!slider) return;
+  const cards = slider.querySelectorAll('.trending-card');
+  const cardW = cards[0] ? cards[0].offsetWidth + 16 : 0;
+  slider.style.transform = `translateX(-${state.trendIndex * cardW}px)`;
+  slider.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
+  document.querySelectorAll('#trend-dots .slider-dot').forEach((d,i) => {
+    d.classList.toggle('active', i === state.trendIndex);
+  });
+}
+
+// Shop trending slider
+function shopTrendSlide(dir) {
+  const trending = PRODUCTS.filter(p => p.isTrending);
+  state.shopTrendIndex = Math.max(0, Math.min(trending.length - 1, state.shopTrendIndex + dir));
+  const slider = document.getElementById('shop-trending-slider');
+  if (!slider) return;
+  const cards = slider.querySelectorAll('.trending-card');
+  const cardW = cards[0] ? cards[0].offsetWidth + 12 : 0;
+  slider.style.transform = `translateX(-${state.shopTrendIndex * cardW}px)`;
+  slider.style.transition = 'transform .4s cubic-bezier(.4,0,.2,1)';
+}
+
+// ══ Signup Role ══
+function selectSignupRole(role) {
+  state.signupRole = role;
+  document.querySelectorAll('#signup-role-grid .signup-role-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.role === role);
+  });
+  const note = document.getElementById('signup-pending-note');
+  if (note) note.style.display = ['designer','printing','advertiser'].includes(role) ? 'block' : 'none';
+}
+
+// ══ Partner Type ══
+function selectPartnerType(type) {
+  state.partnerType = type;
+  document.querySelectorAll('#partner-type-grid .partner-type-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.type === type);
+  });
+}
+
+// ══ Auth Functions ══
+function toggleLoginPass() {
+  const inp = document.getElementById('login-pass');
+  const icon = document.getElementById('login-pass-icon');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  icon.className = inp.type === 'password' ? 'bi bi-eye-slash' : 'bi bi-eye';
+}
+
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function clearAuthError(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('show');
+}
+
+async function doLogin() {
+  clearAuthError('login-error');
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!email || !pass) { showAuthError('login-error', 'Please fill in all fields.'); return; }
+
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+
+  // Try Firebase
+  if (window._fb && window._fb.auth) {
+    try {
+      const cred = await window._fb.signInWithEmailAndPassword(window._fb.auth, email, pass);
+      const userDoc = await window._fb.getDoc(window._fb.doc(window._fb.db, 'users', cred.user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        loginAs(data.role, { name: data.name, email: data.email, initial: data.name[0].toUpperCase(), id: cred.user.uid });
+      } else {
+        loginAs('customer', { name: cred.user.displayName || email, email, initial: (cred.user.displayName || email)[0].toUpperCase(), id: cred.user.uid });
+      }
+      return;
+    } catch(e) {
+      // Fall through to demo
+    }
+  }
+
+  // Demo fallback
+  const demoMap = {
+    'customer@naxshin.com': 'customer',
+    'designer@naxshin.com': 'designer',
+    'printing@naxshin.com': 'printing',
+    'admin@naxshin.com': 'superadmin',
+  };
+  if (demoMap[email]) {
+    demoLogin(demoMap[email]);
+  } else {
+    showAuthError('login-error', 'Invalid credentials. Use demo buttons below or connect Firebase.');
+  }
+  btn.textContent = 'Continue';
+  btn.disabled = false;
+}
+
+async function doGoogleLogin() {
+  if (window._fb && window._fb.auth) {
+    try {
+      const provider = new window._fb.GoogleAuthProvider();
+      const cred = await window._fb.signInWithPopup(window._fb.auth, provider);
+      loginAs('customer', { name: cred.user.displayName, email: cred.user.email, initial: cred.user.displayName[0], id: cred.user.uid });
+      return;
+    } catch(e) {}
+  }
+  showToast('Google login requires Firebase setup.');
+}
+
+async function doSignup() {
+  clearAuthError('signup-error');
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value;
+  const role = state.signupRole;
+
+  if (!name || !email || !pass) { showAuthError('signup-error','Please fill in all fields.'); return; }
+  if (pass.length < 6) { showAuthError('signup-error','Password must be at least 6 characters.'); return; }
+
+  const btn = document.getElementById('signup-btn');
+  btn.textContent = 'Creating…';
+  btn.disabled = true;
+
+  // Try Firebase
+  if (window._fb && window._fb.auth) {
+    try {
+      const cred = await window._fb.createUserWithEmailAndPassword(window._fb.auth, email, pass);
+      const needsApproval = ['designer','printing','advertiser'].includes(role);
+      const userRole = needsApproval ? 'pending_' + role : role;
+      await window._fb.setDoc(window._fb.doc(window._fb.db, 'users', cred.user.uid), {
+        name, email, role: userRole, createdAt: window._fb.serverTimestamp()
+      });
+      if (needsApproval) {
+        showToast('Account created! Awaiting admin approval. 📧', true);
+        showPage('login');
+      } else {
+        loginAs(role, { name, email, initial: name[0].toUpperCase(), id: cred.user.uid });
+      }
+      return;
+    } catch(e) {
+      showAuthError('signup-error', e.message || 'Signup failed.');
+    }
+  } else {
+    // Demo mode
+    const needsApproval = ['designer','printing','advertiser'].includes(role);
+    if (needsApproval) {
+      showToast('Account requested! Awaiting admin approval. 📧', true);
+      showPage('login');
+    } else {
+      loginAs(role, { name, email, initial: name[0].toUpperCase(), id: 'demo_' + Date.now() });
+    }
+  }
+
+  btn.textContent = 'Create Account';
+  btn.disabled = false;
+}
+
+function demoLogin(role) {
+  const u = DEMO_USERS.find(u => u.role === role) || DEMO_USERS[0];
+  loginAs(role, u);
+}
+
+function loginAs(role, user) {
+  state.role = role;
+  state.currentUser = user;
+  if (role === 'customer') { initCustomer(); showPage('customer'); }
+  else if (role === 'designer') { initDesigner(); showPage('designer'); }
+  else if (role === 'printing') { initPrinting(); showPage('printing'); }
+  else if (role === 'superadmin') { initSuperAdmin(); showPage('superadmin'); }
+  else { showToast('Role not yet supported. Try demo.'); }
+}
+
+async function logout() {
+  if (window._fb && window._fb.auth) {
+    try { await window._fb.signOut(window._fb.auth); } catch(e) {}
+  }
+  state.role = null; state.cart = []; state.wishlist = []; state.orders = []; state.currentUser = null;
+  showPage('landing');
+}
+
+function viewShopAs(fromRole) {
+  state.previousPage = fromRole;
+  renderPreviewShop();
+  showPage('shop-preview');
+}
+
+function goBackFromShopPreview() {
+  if (state.previousPage === 'designer') showPage('designer');
+  else if (state.previousPage === 'printing') showPage('printing');
+  else if (state.previousPage === 'superadmin') showPage('superadmin');
+  else showPage('landing');
+}
+
+// ══ Submit Partner Request ══
+async function submitPartnerRequest() {
+  const name = document.getElementById('partner-name').value.trim();
+  const email = document.getElementById('partner-email').value.trim();
+  const msg = document.getElementById('partner-message').value.trim();
+  if (!name || !email) { showToast('Please fill name and email.'); return; }
+
+  const req = { id: 'pr' + Date.now(), name, email, type: state.partnerType, message: msg, status: 'pending', date: new Date().toISOString().split('T')[0] };
+  PARTNER_REQUESTS.push(req);
+
+  if (window._fb && window._fb.db) {
+    try {
+      await window._fb.addDoc(window._fb.collection(window._fb.db, 'partnerRequests'), { ...req, createdAt: window._fb.serverTimestamp() });
+    } catch(e) {}
+  }
+
+  showToast('Request submitted! We\'ll be in touch. 🤝', true);
+  document.getElementById('partner-name').value = '';
+  document.getElementById('partner-email').value = '';
+  document.getElementById('partner-message').value = '';
+  setTimeout(() => showPage('landing'), 1500);
+}
+
+// ══════════════════════════════════════════
+// CUSTOMER
+// ══════════════════════════════════════════
+function initCustomer() {
+  const u = state.currentUser;
+  const av = document.getElementById('customer-avatar');
+  if (av) av.textContent = u.initial;
+  renderAds(); renderCategoryBar(); renderProducts(); renderCart(); renderShopTrending();
+}
+
+function renderShopTrending() {
+  const trending = PRODUCTS.filter(p => p.isTrending);
+  const slider = document.getElementById('shop-trending-slider');
+  if (!slider) return;
+  slider.innerHTML = trending.map(p => `
+    <div class="trending-card" style="min-width:calc(50% - 8px);" onclick="openProduct('${p.id}')">
+      <div class="trending-card-img" style="height:180px;">
+        <img src="${p.images[0]}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="trending-card-img-placeholder" style="display:none;background:linear-gradient(135deg,${p.gradient[0]},${p.gradient[1]})">${p.icon}</div>
+        <div class="trend-badge">🔥 TRENDING</div>
+      </div>
+      <div class="trending-card-info">
+        <div class="trending-card-name" style="font-size:16px;">${p.name}</div>
+        <div class="trending-card-brand">${p.brand}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="trending-card-price" style="font-size:15px;">$${p.price}</div>
+          <button class="trending-card-btn" onclick="event.stopPropagation();quickAdd('${p.id}')">+ Add</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderAds() {
+  const wrap = document.getElementById('ad-scroll');
+  if (!wrap) return;
+  wrap.innerHTML = ADS.map(ad => `
+    <div class="ad-card" style="background:linear-gradient(135deg,${ad.grad[0]},${ad.grad[1]})">
+      <div class="ad-bubble"></div>
+      <div class="ad-card-inner">
+        <div class="ad-emoji">${ad.emoji}</div>
+        <div class="ad-tag">${ad.tag}</div>
+        <div class="ad-title">${ad.title.replace('\n','<br>')}</div>
+        <div class="ad-cta">${ad.cta}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderCategoryBar() {
+  const cats = ['All','T-Shirt','Hoodie','Pants','Coat','Dress','Accessories'];
+  const bar = document.getElementById('category-bar');
+  if (!bar) return;
+  bar.innerHTML = cats.map(c => `
+    <div class="chip ${(c === 'All' && !state.selectedCategory) || c === state.selectedCategory ? 'active' : ''}" onclick="setCat('${c}')">${c}</div>`).join('');
+}
+
+function setCat(cat) {
+  state.selectedCategory = cat === 'All' ? null : cat;
+  renderCategoryBar(); renderProducts();
+}
+
+function filterProducts() { renderProducts(); }
+
+function renderProducts() {
+  const search = document.getElementById('shop-search')?.value?.toLowerCase() || '';
+  let prods = PRODUCTS.filter(p => {
+    const matchCat = !state.selectedCategory || p.cat === state.selectedCategory;
+    const matchSearch = !search || p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+  const grid = document.getElementById('product-grid');
+  if (grid) grid.innerHTML = prods.map((p, i) => productCardHTML(p, i)).join('');
+}
+
+function productCardHTML(p, i) {
+  const wishlisted = state.wishlist.some(w => w.id === p.id);
+  return `
+<div class="product-card" style="${i % 2 === 1 ? 'margin-top:20px' : ''}" onclick="openProduct('${p.id}')">
+  <div class="product-img">
+    <img src="${p.images[0]}" alt="${p.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="product-img-placeholder" style="display:none;background:linear-gradient(135deg,${p.gradient[0]},${p.gradient[1]})">${p.icon}</div>
+    <div class="product-img-grad"></div>
+    <div class="product-badges">
+      ${p.isNew ? '<span class="badge-new">NEW</span>' : ''}
+      ${p.isTrending ? '<span class="badge-trend">🔥 TREND</span>' : ''}
+    </div>
+    ${p.has3d ? '<div class="badge-3d"><i class="bi bi-badge-ar" style="font-size:10px"></i> 3D</div>' : ''}
+    <button class="wishlist-btn" onclick="event.stopPropagation();toggleWishlist('${p.id}')" id="wbtn-${p.id}">
+      ${wishlisted ? '<i class="bi bi-heart-fill" style="color:#C0392B"></i>' : '<i class="bi bi-heart" style="color:var(--soft-gray)"></i>'}
+    </button>
+  </div>
+  <div class="product-info">
+    <div class="product-name">${p.name}</div>
+    <div class="product-brand">${p.brand}</div>
+    <div class="d-flex align-items-center justify-content-between mt-2">
+      <div class="product-price">$${p.price}</div>
+      <button class="add-btn" onclick="event.stopPropagation();quickAdd('${p.id}')">+</button>
+    </div>
+  </div>
+</div>`;
+}
+
+function toggleWishlist(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  const idx = state.wishlist.findIndex(w => w.id === id);
+  if (idx > -1) { state.wishlist.splice(idx, 1); showToast('Removed from saved'); }
+  else { state.wishlist.push(p); showToast('Saved! ❤️', true); }
+  renderProducts();
+  const wl = document.getElementById('ctab-wishlist-content');
+  if (wl && wl.style.display !== 'none') renderWishlist();
+}
+
+function quickAdd(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  addToCart(p, p.sizes[1] || p.sizes[0], COLORS[p.colors[0]], 1);
+}
+
+function addToCart(product, size, color, qty) {
+  const existing = state.cart.find(c => c.product.id === product.id && c.size === size && c.color.name === color.name);
+  if (existing) existing.qty += qty;
+  else state.cart.push({ product, size, color, qty });
+  renderCart(); updateCartBadge();
+  showToast(`${product.name} added to cart! 🛒`);
+}
+
+function renderCart() {
+  const body = document.getElementById('cart-body');
+  const footer = document.getElementById('cart-footer');
+  if (!body) return;
+  const count = state.cart.reduce((s,c) => s + c.qty, 0);
+  const total = state.cart.reduce((s,c) => s + c.product.price * c.qty, 0);
+  const cl = document.getElementById('cart-count-label');
+  if (cl) cl.textContent = `(${count})`;
+  if (state.cart.length === 0) {
+    body.innerHTML = `<div class="cart-empty"><div style="font-size:64px">🛒</div><div class="section-title mt-3">Your cart is empty</div><div class="text-soft mt-2">Add items to get started</div></div>`;
+    footer.innerHTML = ''; return;
+  }
+  body.innerHTML = state.cart.map((item, i) => `
+    <div class="cart-item">
+      <div class="cart-item-img">
+        <img src="${item.product.images[0]}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+      </div>
+      <div class="flex-grow-1">
+        <div style="font-size:14px;font-weight:700">${item.product.name}</div>
+        <div style="font-size:11px;color:var(--soft-gray)">${item.size} · ${item.color.name}</div>
+        <div class="d-flex align-items-center mt-2 gap-2">
+          <span style="font-size:14px;font-weight:800;font-family:'Cormorant Garamond',serif">$${(item.product.price * item.qty).toFixed(2)}</span>
+          <div class="ms-auto d-flex align-items-center gap-2">
+            <button class="qty-btn" onclick="updateCartQty(${i},${item.qty-1})">−</button>
+            <span style="font-weight:700;font-size:14px">${item.qty}</span>
+            <button class="qty-btn" onclick="updateCartQty(${i},${item.qty+1})">+</button>
+            <button style="border:none;background:none;cursor:pointer;color:var(--soft-gray);font-size:16px" onclick="removeFromCart(${i})"><i class="bi bi-trash"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+  footer.innerHTML = `
+    <div class="d-flex justify-content-between mb-1"><span class="text-soft">Subtotal</span><span style="font-weight:700;font-family:'Cormorant Garamond',serif">$${total.toFixed(2)}</span></div>
+    <div class="d-flex justify-content-between mb-3"><span class="text-soft">Shipping</span><span style="color:var(--success-green);font-weight:600">Free</span></div>
+    <div class="d-flex justify-content-between mb-3" style="border-top:1px solid var(--light-border);padding-top:12px">
+      <span style="font-weight:700;font-size:16px">Total</span>
+      <span style="font-weight:900;font-size:22px;font-family:'Cormorant Garamond',serif">$${total.toFixed(2)}</span>
+    </div>
+    <button class="btn-naxshin-dark" onclick="placeOrder()">Place Order</button>`;
+}
+
+function updateCartQty(i, qty) {
+  if (qty <= 0) state.cart.splice(i, 1); else state.cart[i].qty = qty;
+  renderCart(); updateCartBadge();
+}
+function removeFromCart(i) { state.cart.splice(i, 1); renderCart(); updateCartBadge(); }
+function clearCart() { if (state.cart.length === 0) return; if (!confirm('Clear all items?')) return; state.cart = []; renderCart(); updateCartBadge(); }
+function placeOrder() {
+  if (state.cart.length === 0) return;
+  const total = state.cart.reduce((s,c) => s + c.product.price * c.qty, 0);
+  state.orders.unshift({ id:'ORD-'+Date.now(), items:state.cart.length, total, status:'pending' });
+  state.cart = []; renderCart(); updateCartBadge(); closeCart();
+  showToast('🎉 Order placed successfully!', true);
+}
+function updateCartBadge() {
+  const count = state.cart.reduce((s,c) => s + c.qty, 0);
+  const badge = document.getElementById('cart-badge');
+  if (badge) { badge.style.display = count > 0 ? 'flex' : 'none'; badge.textContent = count; }
+}
+function openCart() { document.getElementById('cart-sidebar')?.classList.add('open'); document.getElementById('cart-overlay')?.classList.add('open'); }
+function closeCart() { document.getElementById('cart-sidebar')?.classList.remove('open'); document.getElementById('cart-overlay')?.classList.remove('open'); }
+
+function customerTab(tab) {
+  ['shop','wishlist','profile'].forEach(t => {
+    const c = document.getElementById(`ctab-${t}-content`);
+    if (c) c.style.display = t === tab ? 'block' : 'none';
+    const b = document.getElementById(`ctab-${t}`);
+    if (b) b.classList.remove('active', 'active-customer');
+  });
+  const active = document.getElementById(`ctab-${tab}`);
+  if (active) active.classList.add('active-customer', 'active');
+  if (tab === 'wishlist') renderWishlist();
+  if (tab === 'profile') renderProfileCustomer();
+}
+
+function renderWishlist() {
+  const el = document.getElementById('wishlist-content');
+  if (!el) return;
+  if (state.wishlist.length === 0) {
+    el.innerHTML = `<div class="text-center py-5"><div style="font-size:64px">🤍</div><div class="section-title mt-3">Nothing saved yet</div><div class="text-soft mt-2">Tap ♡ on any product to save it</div></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="product-grid">${state.wishlist.map((p,i) => productCardHTML(p,i)).join('')}</div>`;
+}
+
+function renderProfileCustomer() {
+  const u = state.currentUser;
+  const el = document.getElementById('ctab-profile-content');
+  if (!el) return;
+  const totalSpent = state.orders.reduce((s,o) => s + o.total, 0);
+  el.innerHTML = `
+    <h2 class="section-title mb-4">Profile</h2>
+    <div class="text-center mb-4">
+      <div class="profile-avatar">${u.initial}</div>
+      <div style="font-size:20px;font-weight:800;font-family:'Cormorant Garamond',serif">${u.name}</div>
+      <div class="text-soft" style="font-size:13px">${u.email}</div>
+      <div class="mt-2"><span class="role-badge" style="background:rgba(107,143,173,.15);color:var(--customer-color)">🛍️ Customer</span></div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-4"><div class="stat-card text-center"><div style="font-size:24px;font-weight:900;font-family:'Cormorant Garamond',serif">${state.orders.length}</div><div class="stat-label">Orders</div></div></div>
+      <div class="col-4"><div class="stat-card text-center"><div style="font-size:24px;font-weight:900;font-family:'Cormorant Garamond',serif">${state.wishlist.length}</div><div class="stat-label">Saved</div></div></div>
+      <div class="col-4"><div class="stat-card text-center"><div style="font-size:24px;font-weight:900;font-family:'Cormorant Garamond',serif">$${totalSpent}</div><div class="stat-label">Spent</div></div></div>
+    </div>
+    <h3 class="section-title mb-3" style="font-size:18px">My Orders</h3>
+    ${state.orders.length === 0 && DEMO_ORDERS.length === 0 ? '<div class="text-center text-soft py-4">No orders yet</div>' : [...state.orders, ...DEMO_ORDERS.slice(0,3)].map(o => orderTileHTML(o)).join('')}
+    <div class="section-gap"></div>
+    <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>`;
+}
+
+function openProduct(id) {
+  const p = PRODUCTS.find(x => x.id === id);
+  if (!p) return;
+  state.currentProduct = p;
+  state.selectedSize = p.sizes[1] || p.sizes[0];
+  state.selectedColor = COLORS[p.colors[0]];
+  state.quantity = 1;
+  state.imgIndex = 0;
+  const modal = document.getElementById('product-modal');
+  const sheet = document.getElementById('modal-sheet');
+  if (!modal || !sheet) return;
+  sheet.innerHTML = `
+    <div class="modal-img-wrap" id="modal-img-wrap">
+      <img src="${p.images[0]}" id="modal-img" alt="${p.name}">
+      <div class="modal-top-btns">
+        <button class="modal-top-btn" onclick="closeModal()"><i class="bi bi-x-lg" style="font-size:14px"></i></button>
+        <button class="modal-top-btn ms-auto" onclick="toggleWishlist('${p.id}')"><i class="bi bi-heart" style="font-size:15px"></i></button>
+      </div>
+    </div>
+    ${p.images.length > 1 ? `<div class="img-dots">${p.images.map((_,i) => `<button class="img-dot ${i===0?'active':''}" onclick="switchImg(${i})"></button>`).join('')}</div>` : ''}
+    <div style="padding:16px">
+      <div class="d-flex align-items-start justify-content-between mb-2">
+        <div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700">${p.name}</h2>
+          <div class="text-soft" style="font-size:12px">${p.brand}</div>
+        </div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:800">$${p.price}</div>
+      </div>
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <span style="color:#E0A030;font-size:13px">${'★'.repeat(Math.floor(p.rating))}${'☆'.repeat(5-Math.floor(p.rating))}</span>
+        <span class="text-soft" style="font-size:12px">${p.rating} (${p.reviews} reviews)</span>
+      </div>
+      <p class="text-soft" style="font-size:13px;line-height:1.6;margin-bottom:16px">${p.desc}</p>
+      <div class="mb-3">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">COLOR — ${state.selectedColor.name}</div>
+        <div class="d-flex gap-2 flex-wrap">
+          ${p.colors.map(ci => `<div class="color-dot ${COLORS[ci].name === state.selectedColor.name ? 'active' : ''}" style="background:${COLORS[ci].hex};border-color:${COLORS[ci].name === state.selectedColor.name ? 'var(--charcoal)' : COLORS[ci].hex}" onclick="selectColor(${ci})"></div>`).join('')}
+        </div>
+      </div>
+      <div class="mb-4">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div style="font-size:12px;font-weight:700">SIZE</div>
+          <span class="text-caramel" style="font-size:12px;cursor:pointer">Size Guide</span>
+        </div>
+        <div class="d-flex gap-2 flex-wrap" id="size-btns">
+          ${p.sizes.map(s => `<button class="size-btn ${s === state.selectedSize ? 'active' : ''}" onclick="selectSize('${s}')">${s}</button>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="d-flex align-items-center gap-2 me-2">
+        <button class="qty-btn" onclick="modalQty(-1)">−</button>
+        <span style="font-weight:700;font-size:16px;min-width:24px;text-align:center" id="modal-qty">${state.quantity}</span>
+        <button class="qty-btn" onclick="modalQty(1)">+</button>
+      </div>
+      <button class="btn-naxshin-dark flex-fill" onclick="modalAddToCart()">Add to Cart — $${(p.price * state.quantity).toFixed(2)}</button>
+    </div>`;
+  modal.classList.add('open');
+}
+function closeModal() { document.getElementById('product-modal')?.classList.remove('open'); }
+function selectSize(s) {
+  state.selectedSize = s;
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.toggle('active', b.textContent === s));
+}
+function selectColor(ci) {
+  state.selectedColor = COLORS[ci];
+  document.querySelectorAll('.color-dot').forEach((d,i) => d.classList.toggle('active', COLORS[state.currentProduct.colors[i]] === state.selectedColor));
+  openProduct(state.currentProduct.id);
+}
+function modalQty(d) {
+  state.quantity = Math.max(1, state.quantity + d);
+  const el = document.getElementById('modal-qty');
+  if (el) el.textContent = state.quantity;
+}
+function modalAddToCart() {
+  if (!state.selectedSize) { showToast('Please select a size'); return; }
+  addToCart(state.currentProduct, state.selectedSize, state.selectedColor, state.quantity);
+  closeModal();
+}
+function switchImg(i) {
+  const p = state.currentProduct;
+  if (!p || !p.images[i]) return;
+  state.imgIndex = i;
+  const img = document.getElementById('modal-img');
+  if (img) img.src = p.images[i];
+  document.querySelectorAll('.img-dot').forEach((d,j) => d.classList.toggle('active', j === i));
+}
+
+// ══ Preview Shop (for admins) ══
+function renderPreviewShop() {
+  const adScroll = document.getElementById('preview-ad-scroll');
+  if (adScroll) {
+    adScroll.innerHTML = ADS.map(ad => `
+      <div class="ad-card" style="background:linear-gradient(135deg,${ad.grad[0]},${ad.grad[1]})">
+        <div class="ad-bubble"></div>
+        <div class="ad-card-inner">
+          <div class="ad-emoji">${ad.emoji}</div>
+          <div class="ad-tag">${ad.tag}</div>
+          <div class="ad-title">${ad.title.replace('\n','<br>')}</div>
+          <div class="ad-cta">${ad.cta}</div>
+        </div>
+      </div>`).join('');
+  }
+  const catBar = document.getElementById('preview-category-bar');
+  if (catBar) {
+    const cats = ['All','T-Shirt','Hoodie','Pants','Coat','Dress','Accessories'];
+    catBar.innerHTML = cats.map(c => `<div class="chip ${c==='All'?'active':''}">${c}</div>`).join('');
+  }
+  const grid = document.getElementById('preview-product-grid');
+  if (grid) grid.innerHTML = PRODUCTS.map((p,i) => productCardHTML(p,i)).join('');
+}
+function filterPreviewProducts() {
+  const search = document.getElementById('preview-search')?.value?.toLowerCase() || '';
+  const grid = document.getElementById('preview-product-grid');
+  if (!grid) return;
+  const filtered = PRODUCTS.filter(p => !search || p.name.toLowerCase().includes(search) || p.brand.toLowerCase().includes(search));
+  grid.innerHTML = filtered.map((p,i) => productCardHTML(p,i)).join('');
+}
+
+// ══════════════════════════════════════════
+// DESIGNER
+// ══════════════════════════════════════════
+function initDesigner() {
+  const u = state.currentUser;
+  const av = document.getElementById('designer-avatar');
+  if (av) av.textContent = u.initial;
+  renderDesignerDashboard();
+}
+function designerTab(tab) {
+  ['dashboard','designs','upload','dprofile'].forEach(t => {
+    const c = document.getElementById(`dtab-${t}-content`);
+    if (c) c.style.display = t === tab ? 'block' : 'none';
+    const b = document.getElementById(`dtab-${t}`);
+    if (b) b.classList.remove('active','active-designer');
+  });
+  const active = document.getElementById(`dtab-${tab}`);
+  if (active) active.classList.add('active-designer','active');
+  if (tab === 'dashboard') renderDesignerDashboard();
+  if (tab === 'designs') renderDesignerDesigns();
+  if (tab === 'upload') renderDesignerUpload();
+  if (tab === 'dprofile') renderDesignerProfile();
+}
+function renderDesignerDashboard() {
+  const el = document.getElementById('dtab-dashboard-content');
+  if (!el) return;
+  const u = state.currentUser;
+  el.innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <div class="text-soft" style="font-size:12px;font-weight:500">Designer Panel</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:28px">${u.name} <span style="color:var(--designer-color)">🎨</span></div>
+      </div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(142,107,173,.12)"><i class="bi bi-palette" style="color:var(--designer-color)"></i></div><div class="stat-value" style="color:var(--designer-color)">${state.designs.length + 3}</div><div class="stat-label">Designs</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(184,115,51,.12)"><i class="bi bi-currency-dollar" style="color:var(--caramel)"></i></div><div class="stat-value" style="color:var(--caramel)">$847</div><div class="stat-label">Earnings</div><div class="stat-sub">↑ 18% this month</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(39,174,96,.12)"><i class="bi bi-bag-check" style="color:var(--success-green)"></i></div><div class="stat-value" style="color:var(--success-green)">42</div><div class="stat-label">Orders</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(107,143,173,.12)"><i class="bi bi-star" style="color:var(--customer-color)"></i></div><div class="stat-value" style="color:var(--customer-color)">4.8</div><div class="stat-label">Rating</div></div></div>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:20px;margin-bottom:12px">My Designs</h3>
+    ${[{name:'Geometric Pattern Tee',status:'approved',views:234},{name:'Kurdish Motif Hoodie',status:'pending',views:0},{name:'Abstract Print Dress',status:'approved',views:189}].map(d => `
+    <div class="design-tile">
+      <div class="design-icon">🖼️</div>
+      <div class="flex-grow-1">
+        <div style="font-size:14px;font-weight:700">${d.name}</div>
+        <div style="font-size:11px;color:var(--soft-gray)">${d.views > 0 ? d.views + ' views' : 'Pending review'}</div>
+      </div>
+      <span class="order-chip" style="background:${d.status==='approved'?'rgba(39,174,96,.12)':'rgba(224,160,48,.12)'};color:${d.status==='approved'?'var(--success-green)':'#E0A030'}">${d.status}</span>
+    </div>`).join('')}
+    <div class="section-gap"></div>
+    <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>`;
+}
+function renderDesignerDesigns() {
+  const el = document.getElementById('dtab-designs-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="section-title">My Designs</h2>
+      <button class="btn-naxshin-dark" style="padding:8px 16px;font-size:12px;width:auto" onclick="designerTab('upload')">+ Upload</button>
+    </div>
+    ${state.designs.concat([{name:'Geometric Pattern Tee',cat:'T-Shirt',status:'approved'},{name:'Kurdish Motif Hoodie',cat:'Hoodie',status:'pending'},{name:'Abstract Print Dress',cat:'Dress',status:'approved'}]).map(d => `
+    <div class="design-tile">
+      <div class="design-icon">🖼️</div>
+      <div class="flex-grow-1">
+        <div style="font-size:14px;font-weight:700">${d.name}</div>
+        <div style="font-size:11px;color:var(--soft-gray)">${d.cat}</div>
+      </div>
+      <span class="order-chip" style="background:${d.status==='approved'?'rgba(39,174,96,.12)':'rgba(224,160,48,.12)'};color:${d.status==='approved'?'var(--success-green)':'#E0A030'}">${d.status}</span>
+    </div>`).join('')}`;
+}
+function renderDesignerUpload() {
+  const el = document.getElementById('dtab-upload-content');
+  if (!el) return;
+  el.innerHTML = `
+    <h2 class="section-title mb-4">Upload Design</h2>
+    <div class="upload-zone mb-4" onclick="showToast('File upload requires backend integration')">
+      <div style="font-size:48px;margin-bottom:12px">🎨</div>
+      <div style="font-size:15px;font-weight:700">Drop your design here</div>
+      <div class="text-soft" style="font-size:13px;margin-top:4px">PNG, SVG, AI · Max 50MB</div>
+    </div>
+    <div class="input-wrap mb-3">
+      <i class="bi bi-tag input-icon"></i>
+      <input type="text" class="form-control-naxshin" placeholder="Design name" id="design-name-inp">
+    </div>
+    <div class="mb-3">
+      <div style="font-size:12px;font-weight:700;margin-bottom:8px">CATEGORY</div>
+      <div>
+        ${['T-Shirt','Hoodie','Dress','Pants','Accessories'].map(c => `<span class="tag-chip" onclick="this.classList.toggle('active')">${c}</span>`).join('')}
+      </div>
+    </div>
+    <button class="btn-naxshin-dark" onclick="submitDesign()">Submit for Review</button>`;
+}
+function submitDesign() {
+  const name = document.getElementById('design-name-inp')?.value?.trim();
+  if (!name) { showToast('Please enter a design name'); return; }
+  state.designs.unshift({ name, cat: 'T-Shirt', status: 'pending' });
+  showToast('Design submitted for review! ✓', true);
+  designerTab('designs');
+}
+function renderDesignerProfile() {
+  const u = state.currentUser;
+  const el = document.getElementById('dtab-dprofile-content');
+  if (!el) return;
+  el.innerHTML = `
+    <h2 class="section-title mb-4">Profile</h2>
+    <div class="text-center mb-4">
+      <div class="profile-avatar" style="background:var(--designer-color)">${u.initial}</div>
+      <div style="font-size:20px;font-weight:800;font-family:'Cormorant Garamond',serif">${u.name}</div>
+      <div class="text-soft" style="font-size:13px">${u.email}</div>
+      <div class="mt-2"><span class="role-badge" style="background:rgba(142,107,173,.15);color:var(--designer-color)">🎨 Designer</span></div>
+    </div>
+    <button class="logout-btn mt-4" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>`;
+}
+
+// ══════════════════════════════════════════
+// PRINTING
+// ══════════════════════════════════════════
+function initPrinting() {
+  const u = state.currentUser;
+  const av = document.getElementById('printing-avatar');
+  if (av) av.textContent = u.initial;
+  renderPrintingDashboard();
+}
+function printingTab(tab) {
+  ['dashboard','orders','queue','pprofile'].forEach(t => {
+    const c = document.getElementById(`ptab-${t}-content`);
+    if (c) c.style.display = t === tab ? 'block' : 'none';
+    const b = document.getElementById(`ptab-${t}`);
+    if (b) b.classList.remove('active','active-printing');
+  });
+  const active = document.getElementById(`ptab-${tab}`);
+  if (active) active.classList.add('active-printing','active');
+  if (tab === 'dashboard') renderPrintingDashboard();
+  if (tab === 'orders') renderPrintingOrders();
+  if (tab === 'queue') renderPrintingQueue();
+  if (tab === 'pprofile') renderPrintProfile();
+}
+function renderPrintingDashboard() {
+  const el = document.getElementById('ptab-dashboard-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:28px;margin-bottom:16px">Print Dashboard <span style="color:var(--printing-color)">🖨️</span></div>
+    <div class="row g-3 mb-4">
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(91,154,107,.12)"><i class="bi bi-printer" style="color:var(--printing-color)"></i></div><div class="stat-value" style="color:var(--printing-color)">8</div><div class="stat-label">Active Queue</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(39,174,96,.12)"><i class="bi bi-check-circle" style="color:var(--success-green)"></i></div><div class="stat-value" style="color:var(--success-green)">124</div><div class="stat-label">Completed</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(224,160,48,.12)"><i class="bi bi-clock" style="color:#E0A030"></i></div><div class="stat-value" style="color:#E0A030">3</div><div class="stat-label">Pending</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(184,115,51,.12)"><i class="bi bi-truck" style="color:var(--caramel)"></i></div><div class="stat-value" style="color:var(--caramel)">5</div><div class="stat-label">Shipping</div></div></div>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:20px;margin-bottom:12px">Recent Orders</h3>
+    ${DEMO_ORDERS.slice(0,4).map(o => orderTileHTML(o, true)).join('')}
+    <div class="section-gap"></div>
+    <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>`;
+}
+function renderPrintingOrders() {
+  const el = document.getElementById('ptab-orders-content');
+  if (!el) return;
+  el.innerHTML = `<h2 class="section-title mb-4">All Orders</h2>${DEMO_ORDERS.map(o => orderTileHTML(o, true)).join('')}`;
+}
+function renderPrintingQueue() {
+  const el = document.getElementById('ptab-queue-content');
+  if (!el) return;
+  const printing = DEMO_ORDERS.filter(o => o.status === 'printing' || o.status === 'confirmed');
+  el.innerHTML = `
+    <h2 class="section-title mb-4">Print Queue</h2>
+    ${printing.length === 0 ? '<div class="text-center text-soft py-5">Queue is empty 🎉</div>' : printing.map(o => orderTileHTML(o, true)).join('')}`;
+}
+function renderPrintProfile() {
+  const u = state.currentUser;
+  const el = document.getElementById('ptab-pprofile-content');
+  if (!el) return;
+  el.innerHTML = `
+    <h2 class="section-title mb-4">Profile</h2>
+    <div class="text-center mb-4">
+      <div class="profile-avatar" style="background:var(--printing-color)">${u.initial}</div>
+      <div style="font-size:20px;font-weight:800;font-family:'Cormorant Garamond',serif">${u.name}</div>
+      <div class="text-soft" style="font-size:13px">${u.email}</div>
+      <div class="mt-2"><span class="role-badge" style="background:rgba(91,154,107,.15);color:var(--printing-color)">🖨️ Print Admin</span></div>
+    </div>
+    <button class="logout-btn mt-4" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>`;
+}
+
+// ══════════════════════════════════════════
+// SUPER ADMIN
+// ══════════════════════════════════════════
+let revenueChart = null, salesChart = null;
+function initSuperAdmin() {
+  const u = state.currentUser;
+  const av = document.getElementById('super-avatar');
+  if (av) av.textContent = u.initial;
+  renderSuperOverview();
+  renderSuperUsers();
+  renderSuperProducts();
+  renderSuperRequests();
+  renderSuperAnalytics();
+}
+function superTab(tab) {
+  ['overview','users','products','requests','analytics'].forEach(t => {
+    const c = document.getElementById(`stab-${t}-content`);
+    if (c) c.style.display = t === tab ? 'block' : 'none';
+    const b = document.getElementById(`stab-${t}`);
+    if (b) b.classList.remove('active','active-super');
+  });
+  const active = document.getElementById(`stab-${tab}`);
+  if (active) active.classList.add('active-super','active');
+  if (tab === 'analytics') setTimeout(initCharts, 100);
+  if (tab === 'overview') setTimeout(initOverviewChart, 100);
+}
+function renderSuperOverview() {
+  const el = document.getElementById('stab-overview-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <div class="text-soft" style="font-size:12px;font-weight:500">Super Admin</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:30px">NAXSHIN <span style="color:var(--super-color)">👑</span></div>
+      </div>
+    </div>
+    <div class="row g-3 mb-4">
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(184,115,51,.12)"><i class="bi bi-currency-dollar" style="color:var(--super-color)"></i></div><div class="stat-value" style="color:var(--super-color)">$12.8k</div><div class="stat-label">Total Revenue</div><div class="stat-sub">↑ 12% this month</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(107,143,173,.12)"><i class="bi bi-people" style="color:var(--customer-color)"></i></div><div class="stat-value" style="color:var(--customer-color)">${DEMO_USERS.length}</div><div class="stat-label">Total Users</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(91,154,107,.12)"><i class="bi bi-box" style="color:var(--printing-color)"></i></div><div class="stat-value" style="color:var(--printing-color)">${PRODUCTS.length}</div><div class="stat-label">Products</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(142,107,173,.12)"><i class="bi bi-inbox" style="color:var(--designer-color)"></i></div><div class="stat-value" style="color:var(--designer-color)">${PARTNER_REQUESTS.filter(r=>r.status==='pending').length}</div><div class="stat-label">New Requests</div></div></div>
+    </div>
+    <div class="chart-card mb-4">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4 style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:18px">Revenue</h4>
+        <span class="px-2 py-1 rounded" style="background:rgba(184,115,51,.12);color:var(--super-color);font-size:10px;font-weight:600">Last 6 months</span>
+      </div>
+      <div style="height:160px"><canvas id="overview-chart"></canvas></div>
+    </div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:20px;margin-bottom:12px">Platform Users</h3>
+    ${DEMO_USERS.map(u => userTileHTML(u, false)).join('')}
+    <div class="section-gap"></div>
+    <h3 style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:20px;margin-bottom:12px">Recent Orders</h3>
+    ${DEMO_ORDERS.slice(0,3).map(o => orderTileHTML(o)).join('')}
+    <div class="section-gap"></div>
+    <button class="logout-btn" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Sign Out</button>`;
+  setTimeout(initOverviewChart, 100);
+}
+function initOverviewChart() {
+  const canvas = document.getElementById('overview-chart');
+  if (!canvas) return;
+  if (revenueChart) { revenueChart.destroy(); revenueChart = null; }
+  revenueChart = new Chart(canvas, {
+    type:'line',
+    data:{ labels:['Oct','Nov','Dec','Jan','Feb','Mar'], datasets:[{ data:[1.8,2.4,2.1,3.2,2.8,4.1], borderColor:'#B87333', backgroundColor:'rgba(184,115,51,.1)', borderWidth:3, fill:true, tension:0.4, pointRadius:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ display:false } }, y:{ display:false } } }
+  });
+}
+function userTileHTML(u, expanded = false) {
+  const ri = ROLE_INFO[u.role] || ROLE_INFO.customer;
+  const roleColors = { customer:'var(--customer-color)', designer:'var(--designer-color)', printing:'var(--printing-color)', superadmin:'var(--super-color)' };
+  const rc = roleColors[u.role] || 'var(--soft-gray)';
+  return `<div class="user-tile">
+    <div class="user-avatar-sm" style="background:rgba(184,115,51,.15);color:${rc}">${u.initial}</div>
+    <div class="flex-grow-1">
+      <div style="font-size:14px;font-weight:700">${u.name}</div>
+      <div style="font-size:11px;color:var(--soft-gray)">${u.email}</div>
+    </div>
+    <span class="role-badge" style="background:${rc}22;color:${rc}">${ri.emoji} ${ri.label}</span>
+    ${expanded ? `<button class="ms-2" style="border:none;background:none;color:var(--soft-gray);cursor:pointer" onclick="showToast('Options: Edit, Suspend, Delete')"><i class="bi bi-three-dots-vertical"></i></button>` : ''}
+  </div>`;
+}
+function renderSuperUsers() {
+  const el = document.getElementById('stab-users-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="section-title">Users</h2>
+      <button class="btn-naxshin-dark" style="padding:8px 16px;font-size:12px;width:auto" onclick="showToast('Add User form — connect Firebase')">+ Add User</button>
+    </div>
+    ${DEMO_USERS.map(u => userTileHTML(u, true)).join('')}`;
+}
+function renderSuperProducts() {
+  const el = document.getElementById('stab-products-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="section-title">Products</h2>
+      <span class="text-soft" style="font-size:13px">${PRODUCTS.length} items</span>
+    </div>
+    ${PRODUCTS.map(p => `
+    <div class="product-row">
+      <div class="product-thumb">
+        <img src="${p.images[0]}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
+      </div>
+      <div class="flex-grow-1">
+        <div style="font-size:13px;font-weight:700">${p.name}</div>
+        <div style="font-size:11px;color:var(--soft-gray)">${p.cat} · $${p.price}</div>
+      </div>
+      <button style="border:none;background:none;color:var(--soft-gray);cursor:pointer" onclick="showToast('Options: Edit, Delete')"><i class="bi bi-three-dots-vertical"></i></button>
+    </div>`).join('')}`;
+}
+function renderSuperRequests() {
+  const el = document.getElementById('stab-requests-content');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <h2 class="section-title">Partner Requests</h2>
+      <span class="role-badge" style="background:rgba(184,115,51,.12);color:var(--caramel)">${PARTNER_REQUESTS.filter(r=>r.status==='pending').length} pending</span>
+    </div>
+    ${PARTNER_REQUESTS.map(r => `
+    <div class="user-tile mb-2" style="flex-direction:column;align-items:stretch;gap:8px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="user-avatar-sm" style="background:rgba(184,115,51,.12);color:var(--caramel)">${r.name[0]}</div>
+        <div class="flex-grow-1">
+          <div style="font-size:14px;font-weight:700">${r.name}</div>
+          <div style="font-size:11px;color:var(--soft-gray)">${r.email} · ${r.date}</div>
+        </div>
+        <span class="order-chip" style="background:${r.status==='approved'?'rgba(39,174,96,.12)':'rgba(224,160,48,.12)'};color:${r.status==='approved'?'var(--success-green)':'#E0A030'}">${r.type}</span>
+      </div>
+      ${r.message ? `<div style="font-size:12px;color:var(--soft-gray);padding-left:52px">${r.message}</div>` : ''}
+      ${r.status === 'pending' ? `
+      <div style="display:flex;gap:8px;padding-left:52px;">
+        <button onclick="handlePartnerReq('${r.id}','approved')" style="flex:1;padding:8px;background:var(--success-green);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">✓ Approve</button>
+        <button onclick="handlePartnerReq('${r.id}','rejected')" style="flex:1;padding:8px;background:var(--error-red);color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;">✗ Reject</button>
+      </div>` : ''}
+    </div>`).join('')}`;
+}
+function handlePartnerReq(id, status) {
+  const req = PARTNER_REQUESTS.find(r => r.id === id);
+  if (req) req.status = status;
+  showToast(status === 'approved' ? 'Request approved! ✓' : 'Request rejected.', status === 'approved');
+  renderSuperRequests();
+  renderSuperOverview();
+}
+function renderSuperAnalytics() {
+  const el = document.getElementById('stab-analytics-content');
+  if (!el) return;
+  el.innerHTML = `
+    <h2 class="section-title mb-4">Analytics</h2>
+    <div class="chart-card mb-4">
+      <h4 style="font-family:'Cormorant Garamond',serif;font-weight:700;font-size:18px;margin-bottom:12px">Sales by Category</h4>
+      <div style="height:200px"><canvas id="sales-chart"></canvas></div>
+    </div>
+    <div class="row g-3">
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(39,174,96,.12)"><i class="bi bi-graph-up" style="color:var(--success-green)"></i></div><div class="stat-value" style="color:var(--success-green)">3.2%</div><div class="stat-label">Conversion Rate</div><div class="stat-sub">↑ 0.5% vs last month</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(184,115,51,.12)"><i class="bi bi-bag" style="color:var(--caramel)"></i></div><div class="stat-value" style="color:var(--caramel)">$78</div><div class="stat-label">Avg Order</div><div class="stat-sub">↑ $6 vs last month</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(107,143,173,.12)"><i class="bi bi-arrow-repeat" style="color:var(--customer-color)"></i></div><div class="stat-value" style="color:var(--customer-color)">2.1%</div><div class="stat-label">Return Rate</div></div></div>
+      <div class="col-6"><div class="stat-card"><div class="stat-icon-wrap" style="background:rgba(142,107,173,.12)"><i class="bi bi-person-plus" style="color:var(--designer-color)"></i></div><div class="stat-value" style="color:var(--designer-color)">+124</div><div class="stat-label">New Users</div><div class="stat-sub">This month</div></div></div>
+    </div>`;
+  setTimeout(initCharts, 100);
+}
+function initCharts() {
+  const canvas = document.getElementById('sales-chart');
+  if (!canvas) return;
+  if (salesChart) { salesChart.destroy(); salesChart = null; }
+  salesChart = new Chart(canvas, {
+    type:'bar',
+    data:{ labels:['Tee','Hoodie','Pants','Coat','Dress','Acc'], datasets:[{ data:[4.2,3.1,2.8,3.8,2.1,1.4], backgroundColor:['#6B8FAD','#8E6BAD','#5B9A6B','#B87333','#B87333','#9A9A5B'], borderRadius:8, borderWidth:0 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ grid:{ display:false } }, y:{ display:false } } }
+  });
+}
+
+// ══ Shared ══
+function orderTileHTML(o, showActions = false) {
+  const sc = STATUS_COLORS[o.status] || '#888';
+  return `<div class="order-tile mb-2">
+    <div class="order-row">
+      <div class="flex-grow-1">
+        <div style="font-size:13px;font-weight:700">${o.id}</div>
+        <div style="font-size:11px;color:var(--soft-gray)">${o.items} item(s) · $${typeof o.total === 'number' ? o.total.toFixed(2) : o.total}</div>
+      </div>
+      <span class="order-chip" style="background:${sc}22;color:${sc}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span>
+    </div>
+    ${showActions ? `
+    <div class="d-flex gap-2 mt-3">
+      <button class="btn-outline-naxshin flex-fill" style="padding:8px;font-size:12px" onclick="showToast('Details coming soon!')">View Details</button>
+      <button class="btn-naxshin-dark flex-fill" style="background:var(--printing-color);padding:8px;font-size:12px" onclick="showToast('Order marked done ✓', true)">Mark Done</button>
+    </div>` : ''}
+  </div>`;
+}
+
+// ══ Toast ══
+function showToast(msg, success = false) {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast-naxshin${success ? ' success' : ''}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ══ Init ══
+document.addEventListener('DOMContentLoaded', () => {
+  initLanding();
+
+  // Firebase auth listener
+  if (window._fb && window._fb.auth && window._fb.onAuthStateChanged) {
+    window._fb.onAuthStateChanged(window._fb.auth, async (user) => {
+      if (user && !state.role) {
+        try {
+          const userDoc = await window._fb.getDoc(window._fb.doc(window._fb.db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            loginAs(data.role, { name: data.name, email: data.email, initial: data.name[0].toUpperCase(), id: user.uid });
+          }
+        } catch(e) {}
+      }
+    });
+  }
+});
+</script>
+</body>
+</html>
